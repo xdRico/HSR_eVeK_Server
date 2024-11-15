@@ -4,5 +4,5 @@
 /**
  * 
  */
-module e_VeK_Server {
+module eVeK_Server {
 }
