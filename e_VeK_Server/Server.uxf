@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram program="umlet" version="15.1.0">
-  <zoom_level>6</zoom_level>
+  <zoom_level>5</zoom_level>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>42</x>
-      <y>162</y>
-      <w>180</w>
-      <h>114</h>
+      <x>0</x>
+      <y>135</y>
+      <w>150</w>
+      <h>95</h>
     </coordinates>
     <panel_attributes>*Main*
 Package::/core
@@ -22,10 +22,10 @@ static main(arguments: String[]): void
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>42</x>
+      <x>0</x>
       <y>0</y>
-      <w>180</w>
-      <h>114</h>
+      <w>150</w>
+      <h>95</h>
     </coordinates>
     <panel_attributes>*DatabaseHandler*
 Package::/core
@@ -40,10 +40,10 @@ Instance(): DatabaseHandler
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>282</x>
+      <x>200</x>
       <y>0</y>
-      <w>180</w>
-      <h>114</h>
+      <w>150</w>
+      <h>95</h>
     </coordinates>
     <panel_attributes>*ClientConnection*
 Package::/core
@@ -59,10 +59,10 @@ Instance(): ConnectionHandler
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1104</x>
-      <y>606</y>
-      <w>396</w>
-      <h>954</h>
+      <x>885</x>
+      <y>505</y>
+      <w>330</w>
+      <h>795</h>
     </coordinates>
     <panel_attributes>*JDBCRepository*
 Package::/database
@@ -167,10 +167,10 @@ static interface Provider
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>282</x>
-      <y>162</y>
-      <w>180</w>
-      <h>114</h>
+      <x>200</x>
+      <y>135</y>
+      <w>150</w>
+      <h>95</h>
     </coordinates>
     <panel_attributes>*ConnectionHandler*
 Package::/core
@@ -185,10 +185,10 @@ Instance(): ConnectionHandler
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1326</x>
+      <x>1070</x>
       <y>0</y>
-      <w>366</w>
-      <h>114</h>
+      <w>305</w>
+      <h>95</h>
     </coordinates>
     <panel_attributes>*Protocol*
 Package::/entity
@@ -208,10 +208,10 @@ Protocol updateWith(s. DB-UML)</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1104</x>
-      <y>396</y>
-      <w>396</w>
-      <h>114</h>
+      <x>885</x>
+      <y>330</y>
+      <w>330</w>
+      <h>95</h>
     </coordinates>
     <panel_attributes>*Patient*
 Package::/entity
@@ -231,10 +231,10 @@ Patient updateWith(s. DB-UML)</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1326</x>
-      <y>264</y>
-      <w>444</w>
-      <h>114</h>
+      <x>1070</x>
+      <y>220</y>
+      <w>370</w>
+      <h>95</h>
     </coordinates>
     <panel_attributes>*TransportDoc*
 Package::/entity
@@ -254,10 +254,10 @@ TransportDoc updateWith(s. DB-UML)</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1326</x>
-      <y>132</y>
-      <w>444</w>
-      <h>114</h>
+      <x>1070</x>
+      <y>110</y>
+      <w>370</w>
+      <h>95</h>
     </coordinates>
     <panel_attributes>*Transport*
 Package::/entity
@@ -277,10 +277,10 @@ Transport updateWith(s. DB-UML)</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>558</x>
-      <y>264</y>
-      <w>366</w>
-      <h>114</h>
+      <x>430</x>
+      <y>220</y>
+      <w>305</w>
+      <h>95</h>
     </coordinates>
     <panel_attributes>*HealthcareServiceProvider*
 Package::/entity
@@ -300,10 +300,10 @@ HealthcareServiceProvider updateWith(s. DB-UML)</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>558</x>
-      <y>132</y>
-      <w>366</w>
-      <h>114</h>
+      <x>430</x>
+      <y>110</y>
+      <w>305</w>
+      <h>95</h>
     </coordinates>
     <panel_attributes>*Invoice*
 Package::/entity
@@ -323,10 +323,10 @@ Invoice updateWith(s. DB-UML)</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>558</x>
+      <x>430</x>
       <y>0</y>
-      <w>366</w>
-      <h>114</h>
+      <w>305</w>
+      <h>95</h>
     </coordinates>
     <panel_attributes>*TransportServiceProvider*
 Package::/entity
@@ -346,10 +346,10 @@ TransportServiceProvider updateWith(s. DB-UML)</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>558</x>
-      <y>396</y>
-      <w>528</w>
-      <h>114</h>
+      <x>430</x>
+      <y>330</y>
+      <w>440</w>
+      <h>95</h>
     </coordinates>
     <panel_attributes>*User*
 Package::/entity
@@ -369,10 +369,10 @@ User updateWith(s. DB-UML)</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1080</x>
-      <y>144</y>
-      <w>72</w>
-      <h>48</h>
+      <x>865</x>
+      <y>120</y>
+      <w>60</w>
+      <h>40</h>
     </coordinates>
     <panel_attributes>*ID&lt;T&gt;*
 Package::/type
@@ -385,10 +385,10 @@ value: String
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>96</x>
-      <y>606</y>
-      <w>372</w>
-      <h>114</h>
+      <x>45</x>
+      <y>505</y>
+      <w>310</w>
+      <h>95</h>
     </coordinates>
     <panel_attributes>*TransportManagementService*
 Package::/data
@@ -407,10 +407,10 @@ HealthcareServiceProvider process(HealthcareServiceProvider.Command cmd) throws 
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1662</x>
-      <y>606</y>
-      <w>126</w>
-      <h>42</h>
+      <x>1350</x>
+      <y>505</y>
+      <w>105</w>
+      <h>35</h>
     </coordinates>
     <panel_attributes>*SQLBuilder*
 Package::/database
@@ -420,10 +420,10 @@ existing SQL Builder class</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>558</x>
-      <y>606</y>
-      <w>396</w>
-      <h>558</h>
+      <x>430</x>
+      <y>505</y>
+      <w>330</w>
+      <h>465</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Interface&gt;&gt;
 *IRepository*
@@ -487,10 +487,10 @@ static Instance():Repository</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>96</x>
-      <y>768</y>
-      <w>372</w>
-      <h>114</h>
+      <x>45</x>
+      <y>640</y>
+      <w>310</w>
+      <h>95</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Interface&gt;&gt;
 *ITransportManagementService*
@@ -509,10 +509,10 @@ HealthcareServiceProvider process(HealthcareServiceProvider.Command cmd) throws 
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>276</x>
-      <y>714</y>
-      <w>18</w>
-      <h>66</h>
+      <x>195</x>
+      <y>595</y>
+      <w>15</w>
+      <h>55</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;.</panel_attributes>
     <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
@@ -520,10 +520,10 @@ HealthcareServiceProvider process(HealthcareServiceProvider.Command cmd) throws 
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>948</x>
-      <y>624</y>
-      <w>168</w>
-      <h>18</h>
+      <x>755</x>
+      <y>520</y>
+      <w>140</w>
+      <h>15</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;.</panel_attributes>
     <additional_attributes>10.0;10.0;260.0;10.0</additional_attributes>
@@ -531,10 +531,10 @@ HealthcareServiceProvider process(HealthcareServiceProvider.Command cmd) throws 
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1146</x>
-      <y>24</y>
-      <w>192</w>
-      <h>150</h>
+      <x>920</x>
+      <y>20</y>
+      <w>160</w>
+      <h>125</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1
@@ -545,10 +545,10 @@ m2=0..1
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1104</x>
-      <y>186</y>
-      <w>42</w>
-      <h>222</h>
+      <x>885</x>
+      <y>155</y>
+      <w>35</w>
+      <h>185</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1
@@ -559,10 +559,10 @@ m2=0..1
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>918</x>
-      <y>174</y>
-      <w>174</w>
-      <h>120</h>
+      <x>730</x>
+      <y>145</y>
+      <w>145</w>
+      <h>100</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1
@@ -573,10 +573,10 @@ m2=0..1
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1020</x>
-      <y>186</y>
-      <w>96</w>
-      <h>222</h>
+      <x>815</x>
+      <y>155</y>
+      <w>80</w>
+      <h>185</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1
@@ -587,10 +587,10 @@ m2=0..1
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>918</x>
-      <y>24</y>
-      <w>174</w>
-      <h>150</h>
+      <x>730</x>
+      <y>20</y>
+      <w>145</w>
+      <h>125</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1
@@ -601,10 +601,10 @@ m2=0..1
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>918</x>
-      <y>156</y>
-      <w>174</w>
-      <h>30</h>
+      <x>730</x>
+      <y>130</y>
+      <w>145</w>
+      <h>25</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1
@@ -615,10 +615,10 @@ m2=0..1
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1146</x>
-      <y>156</y>
-      <w>192</w>
-      <h>30</h>
+      <x>920</x>
+      <y>130</y>
+      <w>160</w>
+      <h>25</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1
@@ -629,10 +629,10 @@ m2=0..1
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1146</x>
-      <y>174</y>
-      <w>192</w>
-      <h>120</h>
+      <x>920</x>
+      <y>145</y>
+      <w>160</w>
+      <h>100</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1
@@ -643,10 +643,10 @@ m2=0..1
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>126</x>
-      <y>108</y>
-      <w>24</w>
-      <h>66</h>
+      <x>70</x>
+      <y>90</y>
+      <w>20</w>
+      <h>55</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1
@@ -657,10 +657,10 @@ m2=1
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>216</x>
-      <y>162</y>
-      <w>78</w>
-      <h>30</h>
+      <x>145</x>
+      <y>135</y>
+      <w>65</w>
+      <h>25</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1
@@ -671,10 +671,10 @@ m2=1
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>366</x>
-      <y>108</y>
-      <w>30</w>
-      <h>66</h>
+      <x>270</x>
+      <y>90</y>
+      <w>25</w>
+      <h>55</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=0..*
@@ -685,10 +685,10 @@ m2=1
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>132</x>
-      <y>270</y>
-      <w>174</w>
-      <h>348</h>
+      <x>75</x>
+      <y>225</y>
+      <w>145</w>
+      <h>290</h>
     </coordinates>
     <panel_attributes>lt=-
 m1=1
