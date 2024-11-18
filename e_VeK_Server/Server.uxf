@@ -5,17 +5,17 @@
     <id>UMLClass</id>
     <coordinates>
       <x>492</x>
-      <y>222</y>
+      <y>336</y>
       <w>180</w>
       <h>114</h>
     </coordinates>
     <panel_attributes>*Main*
 Package::/core
 --
--static dbHandler: DatabaseHandler
--static conHandler: ConnectionHandler
+_-dbHandler: DatabaseHandler_
+_-conHandler: ConnectionHandler_
 --
-static main(arguments: String[]): void
+_main(arguments: String[]): void_
 </panel_attributes>
     <additional_attributes/>
   </element>
@@ -23,7 +23,7 @@ static main(arguments: String[]): void
     <id>UMLClass</id>
     <coordinates>
       <x>732</x>
-      <y>324</y>
+      <y>438</y>
       <w>180</w>
       <h>114</h>
     </coordinates>
@@ -32,7 +32,7 @@ Package::/core
 --
 
 --
-Instance(): DatabaseHandler
+_Instance(): DatabaseHandler_
 -InitDB(dbConnection: DatabaseConnection): void
 </panel_attributes>
     <additional_attributes/>
@@ -41,7 +41,7 @@ Instance(): DatabaseHandler
     <id>UMLClass</id>
     <coordinates>
       <x>732</x>
-      <y>0</y>
+      <y>114</y>
       <w>180</w>
       <h>114</h>
     </coordinates>
@@ -51,16 +51,14 @@ Package::/core
 -connection:Socket
 -userID:ID&lt;User&gt;
 --
-Instance(): ConnectionHandler
--InitCon(conDetails:ConnectionDetails): void
--waitForConnections(): void</panel_attributes>
+</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
       <x>1002</x>
-      <y>606</y>
+      <y>720</y>
       <w>396</w>
       <h>954</h>
     </coordinates>
@@ -73,41 +71,41 @@ static Instance():Repository
 
 setup():void
 
--static updateSQL(Protocol protocol):String
--static updateSQL(Patient patient):String
--static updateSQL(TransportDoc transportDoc):String
--static updateSQL(Transport transport):String
--static updateSQL(Invoice invoice):String
--static updateSQL(User user):String
--static updateSQL(TransportServiceProvider tsp):String
--static updateSQL(HealthcareServiceProvider hsp):String
+_-updateSQL(Protocol protocol):String_
+_-updateSQL(Patient patient):String_
+_-updateSQL(TransportDoc transportDoc):String_
+_-updateSQL(Transport transport):String_
+_-updateSQL(Invoice invoice):String_
+_-updateSQL(User user):String_
+_-updateSQL(TransportServiceProvider tsp):String_
+_-updateSQL(HealthcareServiceProvider hsp):String_
 
--static insertSQL(Protocol protocol):String
--static insertSQL(Patient patient):String
--static insertSQL(TransportDoc transportDoc):String
--static insertSQL(Transport transport):String
--static insertSQL(Invoice invoice):String
--static insertSQL(User user):String
--static insertSQL(TransportServiceProvider tsp):String
--static insertSQL(HealthcareServiceProvider hsp):String
+_-insertSQL(Protocol protocol):String_
+_-insertSQL(Patient patient):String_
+_-insertSQL(TransportDoc transportDoc):String_
+_-insertSQL(Transport transport):String_
+_-insertSQL(Invoice invoice):String_
+_-insertSQL(User user):String_
+_-insertSQL(TransportServiceProvider tsp):String_
+_-insertSQL(HealthcareServiceProvider hsp):String_
 
--static deleteSQL(Protocol protocol):String
--static deleteSQL(Patient patient):String
--static deleteSQL(TransportDoc transportDoc):String
--static deleteSQL(Transport transport):String
--static deleteSQL(Invoice invoice):String
--static deleteSQL(User user):String
--static deleteSQL(TransportServiceProvider tsp):String
--static deleteSQL(HealthcareServiceProvider hsp):String
+_-deleteSQL(Protocol protocol):String_
+_-deleteSQL(Patient patient):String_
+_-deleteSQL(TransportDoc transportDoc):String_
+_-deleteSQL(Transport transport):String_
+_-deleteSQL(Invoice invoice):String_
+_-deleteSQL(User user):String_
+_-deleteSQL(TransportServiceProvider tsp):String_
+_-deleteSQL(HealthcareServiceProvider hsp):String_
 
--static readProtocol(ResultSet rs):Protocol throws SQLException
--static readPatient(ResultSet rs):Patient throws SQLException
--static readTransportDoc(ResultSet rs):TransportDoc throws SQLException
--static readTransport(ResultSet rs):Transport throws SQLException
--static readInvoice(ResultSet rs):Invoice throws SQLException
--static readUser(ResultSet rs):User throws SQLException
--static readTransportServiceProvider(ResultSet rs):TransportServiceProvider throws SQLException
--static readHealthcareServiceProvider(ResultSet rs):HealthcareServiceProvider throws SQLException
+_-readProtocol(ResultSet rs):Protocol throws SQLException_
+_-readPatient(ResultSet rs):Patient throws SQLException_
+_-readTransportDoc(ResultSet rs):TransportDoc throws SQLException_
+_-readTransport(ResultSet rs):Transport throws SQLException_
+_-readInvoice(ResultSet rs):Invoice throws SQLException_
+_-readUser(ResultSet rs):User throws SQLException_
+_-readTransportServiceProvider(ResultSet rs):TransportServiceProvider throws SQLException_
+_-readHealthcareServiceProvider(ResultSet rs):HealthcareServiceProvider throws SQLException_
 
 ID&lt;Protocol&gt; ProtocolID()
 ID&lt;Patient&gt; PatientID()
@@ -160,7 +158,7 @@ getTransportServiceProvider(ID&lt;ServiceProvider&gt; id):Optional&lt;TransportS
 getHealthcareServiceProvicer(HealthcareServiceProvider.Filter filter):List&lt;HealthcareServiceProvicer&gt;
 getHealthcareServiceProvider(ID&lt;ServiceProvider&gt; id):Optional&lt;HealthcareServiceProvider&gt;
 
-static interface Provider
+_interface Provider_
 </panel_attributes>
     <additional_attributes/>
   </element>
@@ -168,7 +166,7 @@ static interface Provider
     <id>UMLClass</id>
     <coordinates>
       <x>732</x>
-      <y>162</y>
+      <y>276</y>
       <w>180</w>
       <h>114</h>
     </coordinates>
@@ -177,7 +175,7 @@ Package::/core
 --
 -connections:ClientConnection[]
 --
-Instance(): ConnectionHandler
+_Instance(): ConnectionHandler_
 -InitCon(conDetails:ConnectionDetails): void
 -waitForConnections(): void</panel_attributes>
     <additional_attributes/>
@@ -186,7 +184,7 @@ Instance(): ConnectionHandler
     <id>UMLClass</id>
     <coordinates>
       <x>1776</x>
-      <y>0</y>
+      <y>114</y>
       <w>366</w>
       <h>114</h>
     </coordinates>
@@ -196,12 +194,12 @@ record
 --
 s. DB-UML
 --
-static sealed interface Command permits Create, Update, Delete
-static record Create(id: ID&lt;Protocol&gt;, s. DB-UML) implements Command
-static record Update(id: ID&lt;Protocol&gt;, s. DB-UML) implements Command
-static record Delete(id: ID&lt;Protocol&gt;) implements Command
-static record Filter(Optional&lt;Date&gt; date, Optional&lt;ID&lt;User&gt; &gt; user)
-static interface Operations
+_sealed interface Command permits Create, Update, Delete_
+_record Create(id: ID&lt;Protocol&gt;, s. DB-UML) implements Command_
+_record Update(id: ID&lt;Protocol&gt;, s. DB-UML) implements Command_
+_record Delete(id: ID&lt;Protocol&gt;) implements Command_
+_record Filter(Optional&lt;Date&gt; date, Optional&lt;ID&lt;User&gt; &gt; user)_
+_interface Operations_
 Protocol updateWith(s. DB-UML)</panel_attributes>
     <additional_attributes/>
   </element>
@@ -209,7 +207,7 @@ Protocol updateWith(s. DB-UML)</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>1554</x>
-      <y>396</y>
+      <y>510</y>
       <w>396</w>
       <h>114</h>
     </coordinates>
@@ -219,12 +217,12 @@ record
 --
 s. DB-UML
 --
-static sealed interface Command permits Create, Update, Delete
-static record Create(id: ID&lt;Patient&gt;, s. DB-UML) implements Command
-static record Update(id: ID&lt;Patient&gt;, s. DB-UML) implements Command
-static record Delete(id: ID&lt;Patient&gt;) implements Command
-static record Filter(Optional&lt;Date&gt; dateOfBirth, Optional&lt;String&gt; lastName, Optional&lt;String&gt; firstName)
-static interface Operations
+_sealed interface Command permits Create, Update, Delete_
+_record Create(id: ID&lt;Patient&gt;, s. DB-UML) implements Command_
+_record Update(id: ID&lt;Patient&gt;, s. DB-UML) implements Command_
+_record Delete(id: ID&lt;Patient&gt;) implements Command_
+_record Filter(Optional&lt;Date&gt; dateOfBirth, Optional&lt;String&gt; lastName, Optional&lt;String&gt; firstName)_
+_interface Operations_
 Patient updateWith(s. DB-UML)</panel_attributes>
     <additional_attributes/>
   </element>
@@ -232,7 +230,7 @@ Patient updateWith(s. DB-UML)</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>1776</x>
-      <y>264</y>
+      <y>378</y>
       <w>444</w>
       <h>114</h>
     </coordinates>
@@ -242,12 +240,12 @@ record
 --
 s. DB-UML
 --
-static sealed interface Command permits Create, Update, Delete
-static record Create(id: ID&lt;TransportDoc&gt;, s. DB-UML) implements Command
-static record Update(id: ID&lt;TransportDoc&gt;, s. DB-UML) implements Command
-static record Delete(id: ID&lt;TransportDoc&gt;) implements Command
-static record Filter(Optional&lt;Date&gt; date, Optional&lt;ID&lt;Patient&gt; &gt; patient, Optional&lt;ID&lt;ServiceProvider&gt; &gt; sp)
-static interface Operations
+_sealed interface Command permits Create, Update, Delete_
+_record Create(id: ID&lt;TransportDoc&gt;, s. DB-UML) implements Command_
+_record Update(id: ID&lt;TransportDoc&gt;, s. DB-UML) implements Command_
+_record Delete(id: ID&lt;TransportDoc&gt;) implements Command_
+_record Filter(Optional&lt;Date&gt; date, Optional&lt;ID&lt;Patient&gt; &gt; patient, Optional&lt;ID&lt;ServiceProvider&gt; &gt; sp)_
+_interface Operations_
 TransportDoc updateWith(s. DB-UML)</panel_attributes>
     <additional_attributes/>
   </element>
@@ -255,7 +253,7 @@ TransportDoc updateWith(s. DB-UML)</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>1776</x>
-      <y>132</y>
+      <y>246</y>
       <w>444</w>
       <h>114</h>
     </coordinates>
@@ -265,12 +263,12 @@ record
 --
 s. DB-UML
 --
-static sealed interface Command permits Create, Update, Delete
-static record Create(id: ID&lt;Transport&gt;, s. DB-UML) implements Command
-static record Update(id: ID&lt;Transport&gt;, s. DB-UML) implements Command
-static record Delete(id: ID&lt;Transport&gt;) implements Command
-static record Filter(Optional&lt;Date&gt; date, Optional&lt;ID&lt;Patient&gt; &gt; patient, Optional&lt;ID&lt;TransportDoc&gt; &gt; transportDoc)
-static interface Operations
+_sealed interface Command permits Create, Update, Delete_
+_record Create(id: ID&lt;Transport&gt;, s. DB-UML) implements Command_
+_record Update(id: ID&lt;Transport&gt;, s. DB-UML) implements Command_
+_record Delete(id: ID&lt;Transport&gt;) implements Command_
+_record Filter(Optional&lt;Date&gt; date, Optional&lt;ID&lt;Patient&gt; &gt; patient, Optional&lt;ID&lt;TransportDoc&gt; &gt; transportDoc)_
+_interface Operations
 Transport updateWith(s. DB-UML)</panel_attributes>
     <additional_attributes/>
   </element>
@@ -278,7 +276,7 @@ Transport updateWith(s. DB-UML)</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>1008</x>
-      <y>264</y>
+      <y>378</y>
       <w>366</w>
       <h>114</h>
     </coordinates>
@@ -288,12 +286,12 @@ record
 --
 s. DB-UML
 --
-static sealed interface Command permits Create, Update, Delete
-static record Create(id: ID&lt;HealthcareServiceProvider&gt;, s. DB-UML) implements Command
-static record Update(id: ID&lt;HealthcareServiceProvider&gt;, s. DB-UML) implements Command
-static record Delete(id: ID&lt;HealthcareServiceProvider&gt;) implements Command
-static record Filter(Optional&lt;String&gt; name)
-static interface Operations
+_sealed interface Command permits Create, Update, Delete_
+_record Create(id: ID&lt;HealthcareServiceProvider&gt;, s. DB-UML) implements Command_
+_record Update(id: ID&lt;HealthcareServiceProvider&gt;, s. DB-UML) implements Command_
+_record Delete(id: ID&lt;HealthcareServiceProvider&gt;) implements Command_
+_record Filter(Optional&lt;String&gt; name)_
+_interface Operations_
 HealthcareServiceProvider updateWith(s. DB-UML)</panel_attributes>
     <additional_attributes/>
   </element>
@@ -301,7 +299,7 @@ HealthcareServiceProvider updateWith(s. DB-UML)</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>1008</x>
-      <y>132</y>
+      <y>246</y>
       <w>366</w>
       <h>114</h>
     </coordinates>
@@ -311,12 +309,12 @@ record
 --
 s. DB-UML
 --
-static sealed interface Command permits Create, Update, Delete
-static record Create(id: ID&lt;Invoice&gt;, s. DB-UML) implements Command
-static record Update(id: ID&lt;Invoice&gt;, s. DB-UML) implements Command
-static record Delete(id: ID&lt;Invoice&gt;) implements Command
-static record Filter(Optional&lt;Date&gt; date)
-static interface Operations
+_sealed interface Command permits Create, Update, Delete_
+_record Create(id: ID&lt;Invoice&gt;, s. DB-UML) implements Command_
+_record Update(id: ID&lt;Invoice&gt;, s. DB-UML) implements Command_
+_record Delete(id: ID&lt;Invoice&gt;) implements Command_
+_record Filter(Optional&lt;Date&gt; date)_
+_interface Operations_
 Invoice updateWith(s. DB-UML)</panel_attributes>
     <additional_attributes/>
   </element>
@@ -324,7 +322,7 @@ Invoice updateWith(s. DB-UML)</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>1008</x>
-      <y>0</y>
+      <y>114</y>
       <w>366</w>
       <h>114</h>
     </coordinates>
@@ -334,12 +332,12 @@ record
 --
 s. DB-UML
 --
-static sealed interface Command permits Create, Update, Delete
-static record Create(id: ID&lt;ServiceProvider&gt;, s. DB-UML) implements Command
-static record Update(id: ID&lt;ServiceProvider&gt;, s. DB-UML) implements Command
-static record Delete(id: ID&lt;ServiceProvider&gt;) implements Command
-static record Filter(Optional&lt;String&gt; name)
-static interface Operations
+_sealed interface Command permits Create, Update, Delete_
+_record Create(id: ID&lt;ServiceProvider&gt;, s. DB-UML) implements Command_
+_record Update(id: ID&lt;ServiceProvider&gt;, s. DB-UML) implements Command_
+_record Delete(id: ID&lt;ServiceProvider&gt;) implements Command_
+_record Filter(Optional&lt;String&gt; name)_
+_interface Operations_
 TransportServiceProvider updateWith(s. DB-UML)</panel_attributes>
     <additional_attributes/>
   </element>
@@ -347,7 +345,7 @@ TransportServiceProvider updateWith(s. DB-UML)</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>1008</x>
-      <y>396</y>
+      <y>510</y>
       <w>528</w>
       <h>114</h>
     </coordinates>
@@ -357,12 +355,12 @@ record
 --
 s. DB-UML
 --
-static sealed interface Command permits Create, Update, Delete
-static record Create(id: ID&lt;User&gt;, s. DB-UML) implements Command
-static record Update(id: ID&lt;User&gt;, s. DB-UML) implements Command
-static record Delete(id: ID&lt;User&gt;) implements Command
-static record Filter(Optional&lt;Date&gt; dateOfBirth, Optional&lt;String&gt; lastName, Optional&lt;String&gt; firstName, Optional&lt;ID&lt;ServiceProvider&gt; &gt; sp)
-static interface Operations
+_sealed interface Command permits Create, Update, Delete_
+_record Create(id: ID&lt;User&gt;, s. DB-UML) implements Command_
+_record Update(id: ID&lt;User&gt;, s. DB-UML) implements Command_
+_record Delete(id: ID&lt;User&gt;) implements Command_
+_record Filter(Optional&lt;Date&gt; dateOfBirth, Optional&lt;String&gt; lastName, Optional&lt;String&gt; firstName, Optional&lt;ID&lt;ServiceProvider&gt; &gt; sp)_
+_interface Operations_
 User updateWith(s. DB-UML)</panel_attributes>
     <additional_attributes/>
   </element>
@@ -370,7 +368,7 @@ User updateWith(s. DB-UML)</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>1530</x>
-      <y>144</y>
+      <y>258</y>
       <w>72</w>
       <h>48</h>
     </coordinates>
@@ -386,7 +384,7 @@ value: String
     <id>UMLClass</id>
     <coordinates>
       <x>0</x>
-      <y>222</y>
+      <y>336</y>
       <w>372</w>
       <h>114</h>
     </coordinates>
@@ -408,11 +406,12 @@ HealthcareServiceProvider process(HealthcareServiceProvider.Command cmd) throws 
     <id>UMLClass</id>
     <coordinates>
       <x>1446</x>
-      <y>648</y>
+      <y>720</y>
       <w>126</w>
       <h>42</h>
     </coordinates>
-    <panel_attributes>*SQLBuilder*
+    <panel_attributes>&lt;&lt;static&gt;&gt;
+*SQLBuilder*
 Package::/database
 existing SQL Builder class</panel_attributes>
     <additional_attributes/>
@@ -421,7 +420,7 @@ existing SQL Builder class</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>528</x>
-      <y>606</y>
+      <y>720</y>
       <w>396</w>
       <h>558</h>
     </coordinates>
@@ -480,15 +479,15 @@ getTransportServiceProvider(ID&lt;ServiceProvider&gt; id):Optional&lt;TransportS
 getHealthcareServiceProvicer(HealthcareServiceProvider.Filter filter):List&lt;HealthcareServiceProvicer&gt;
 getHealthcareServiceProvider(ID&lt;ServiceProvider&gt; id):Optional&lt;HealthcareServiceProvider&gt;
 
-static interface Provider
-static Instance():Repository</panel_attributes>
+_interface Provider_
+_Instance():Repository_</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLClass</id>
     <coordinates>
       <x>0</x>
-      <y>372</y>
+      <y>486</y>
       <w>372</w>
       <h>114</h>
     </coordinates>
@@ -510,7 +509,7 @@ HealthcareServiceProvider process(HealthcareServiceProvider.Command cmd) throws 
     <id>Relation</id>
     <coordinates>
       <x>180</x>
-      <y>330</y>
+      <y>444</y>
       <w>18</w>
       <h>54</h>
     </coordinates>
@@ -521,7 +520,7 @@ HealthcareServiceProvider process(HealthcareServiceProvider.Command cmd) throws 
     <id>Relation</id>
     <coordinates>
       <x>918</x>
-      <y>624</y>
+      <y>738</y>
       <w>96</w>
       <h>18</h>
     </coordinates>
@@ -532,7 +531,7 @@ HealthcareServiceProvider process(HealthcareServiceProvider.Command cmd) throws 
     <id>Relation</id>
     <coordinates>
       <x>1596</x>
-      <y>24</y>
+      <y>138</y>
       <w>192</w>
       <h>150</h>
     </coordinates>
@@ -546,7 +545,7 @@ m2=0..1
     <id>Relation</id>
     <coordinates>
       <x>1554</x>
-      <y>186</y>
+      <y>300</y>
       <w>42</w>
       <h>222</h>
     </coordinates>
@@ -560,7 +559,7 @@ m2=0..1
     <id>Relation</id>
     <coordinates>
       <x>1368</x>
-      <y>174</y>
+      <y>288</y>
       <w>174</w>
       <h>120</h>
     </coordinates>
@@ -574,7 +573,7 @@ m2=0..1
     <id>Relation</id>
     <coordinates>
       <x>1470</x>
-      <y>186</y>
+      <y>300</y>
       <w>96</w>
       <h>222</h>
     </coordinates>
@@ -588,7 +587,7 @@ m2=0..1
     <id>Relation</id>
     <coordinates>
       <x>1368</x>
-      <y>24</y>
+      <y>138</y>
       <w>174</w>
       <h>150</h>
     </coordinates>
@@ -602,7 +601,7 @@ m2=0..1
     <id>Relation</id>
     <coordinates>
       <x>1368</x>
-      <y>156</y>
+      <y>270</y>
       <w>174</w>
       <h>30</h>
     </coordinates>
@@ -616,7 +615,7 @@ m2=0..1
     <id>Relation</id>
     <coordinates>
       <x>1596</x>
-      <y>156</y>
+      <y>270</y>
       <w>192</w>
       <h>30</h>
     </coordinates>
@@ -630,7 +629,7 @@ m2=0..1
     <id>Relation</id>
     <coordinates>
       <x>1596</x>
-      <y>174</y>
+      <y>288</y>
       <w>192</w>
       <h>120</h>
     </coordinates>
@@ -644,7 +643,7 @@ m2=0..1
     <id>Relation</id>
     <coordinates>
       <x>666</x>
-      <y>222</y>
+      <y>336</y>
       <w>78</w>
       <h>30</h>
     </coordinates>
@@ -658,7 +657,7 @@ m2=1
     <id>Relation</id>
     <coordinates>
       <x>816</x>
-      <y>108</y>
+      <y>222</y>
       <w>30</w>
       <h>66</h>
     </coordinates>
@@ -672,7 +671,7 @@ m2=1
     <id>Relation</id>
     <coordinates>
       <x>366</x>
-      <y>252</y>
+      <y>366</y>
       <w>138</w>
       <h>30</h>
     </coordinates>
@@ -686,7 +685,7 @@ m2=1
     <id>Relation</id>
     <coordinates>
       <x>666</x>
-      <y>294</y>
+      <y>408</y>
       <w>168</w>
       <h>42</h>
     </coordinates>
