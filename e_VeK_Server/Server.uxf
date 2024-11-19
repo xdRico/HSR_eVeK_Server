@@ -5,7 +5,7 @@
     <id>UMLClass</id>
     <coordinates>
       <x>492</x>
-      <y>336</y>
+      <y>222</y>
       <w>180</w>
       <h>114</h>
     </coordinates>
@@ -23,7 +23,7 @@ _main(arguments: String[]): void_
     <id>UMLClass</id>
     <coordinates>
       <x>732</x>
-      <y>438</y>
+      <y>324</y>
       <w>180</w>
       <h>114</h>
     </coordinates>
@@ -41,14 +41,14 @@ _Instance(): DatabaseHandler_
     <id>UMLClass</id>
     <coordinates>
       <x>732</x>
-      <y>114</y>
+      <y>0</y>
       <w>180</w>
       <h>114</h>
     </coordinates>
     <panel_attributes>*ClientConnection*
 Package::/core
 --
--connection:Socket
+connection:Socket
 -userID:ID&lt;User&gt;
 --
 </panel_attributes>
@@ -58,7 +58,7 @@ Package::/core
     <id>UMLClass</id>
     <coordinates>
       <x>1002</x>
-      <y>720</y>
+      <y>606</y>
       <w>396</w>
       <h>954</h>
     </coordinates>
@@ -166,7 +166,7 @@ _interface Provider_
     <id>UMLClass</id>
     <coordinates>
       <x>732</x>
-      <y>276</y>
+      <y>162</y>
       <w>180</w>
       <h>114</h>
     </coordinates>
@@ -184,9 +184,9 @@ _Instance(): ConnectionHandler_
     <id>UMLClass</id>
     <coordinates>
       <x>1776</x>
-      <y>114</y>
+      <y>0</y>
       <w>366</w>
-      <h>114</h>
+      <h>120</h>
     </coordinates>
     <panel_attributes>*Protocol*
 Package::/entity
@@ -207,9 +207,9 @@ Protocol updateWith(s. DB-UML)</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>1554</x>
-      <y>510</y>
+      <y>396</y>
       <w>396</w>
-      <h>114</h>
+      <h>120</h>
     </coordinates>
     <panel_attributes>*Patient*
 Package::/entity
@@ -230,9 +230,9 @@ Patient updateWith(s. DB-UML)</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>1776</x>
-      <y>378</y>
+      <y>264</y>
       <w>444</w>
-      <h>114</h>
+      <h>120</h>
     </coordinates>
     <panel_attributes>*TransportDoc*
 Package::/entity
@@ -253,9 +253,9 @@ TransportDoc updateWith(s. DB-UML)</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>1776</x>
-      <y>246</y>
+      <y>132</y>
       <w>444</w>
-      <h>114</h>
+      <h>120</h>
     </coordinates>
     <panel_attributes>*Transport*
 Package::/entity
@@ -276,9 +276,9 @@ Transport updateWith(s. DB-UML)</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>1008</x>
-      <y>378</y>
+      <y>264</y>
       <w>366</w>
-      <h>114</h>
+      <h>120</h>
     </coordinates>
     <panel_attributes>*HealthcareServiceProvider*
 Package::/entity
@@ -299,9 +299,9 @@ HealthcareServiceProvider updateWith(s. DB-UML)</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>1008</x>
-      <y>246</y>
+      <y>132</y>
       <w>366</w>
-      <h>114</h>
+      <h>120</h>
     </coordinates>
     <panel_attributes>*Invoice*
 Package::/entity
@@ -322,9 +322,9 @@ Invoice updateWith(s. DB-UML)</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>1008</x>
-      <y>114</y>
+      <y>0</y>
       <w>366</w>
-      <h>114</h>
+      <h>120</h>
     </coordinates>
     <panel_attributes>*TransportServiceProvider*
 Package::/entity
@@ -345,9 +345,9 @@ TransportServiceProvider updateWith(s. DB-UML)</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>1008</x>
-      <y>510</y>
+      <y>396</y>
       <w>528</w>
-      <h>114</h>
+      <h>120</h>
     </coordinates>
     <panel_attributes>*User*
 Package::/entity
@@ -368,7 +368,7 @@ User updateWith(s. DB-UML)</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>1530</x>
-      <y>258</y>
+      <y>144</y>
       <w>72</w>
       <h>48</h>
     </coordinates>
@@ -384,7 +384,7 @@ value: String
     <id>UMLClass</id>
     <coordinates>
       <x>0</x>
-      <y>336</y>
+      <y>222</y>
       <w>372</w>
       <h>114</h>
     </coordinates>
@@ -406,9 +406,9 @@ HealthcareServiceProvider process(HealthcareServiceProvider.Command cmd) throws 
     <id>UMLClass</id>
     <coordinates>
       <x>1446</x>
-      <y>720</y>
+      <y>606</y>
       <w>126</w>
-      <h>42</h>
+      <h>48</h>
     </coordinates>
     <panel_attributes>&lt;&lt;static&gt;&gt;
 *SQLBuilder*
@@ -420,7 +420,7 @@ existing SQL Builder class</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>528</x>
-      <y>720</y>
+      <y>606</y>
       <w>396</w>
       <h>558</h>
     </coordinates>
@@ -487,7 +487,7 @@ _Instance():Repository_</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>0</x>
-      <y>486</y>
+      <y>372</y>
       <w>372</w>
       <h>114</h>
     </coordinates>
@@ -509,7 +509,7 @@ HealthcareServiceProvider process(HealthcareServiceProvider.Command cmd) throws 
     <id>Relation</id>
     <coordinates>
       <x>180</x>
-      <y>444</y>
+      <y>330</y>
       <w>18</w>
       <h>54</h>
     </coordinates>
@@ -520,7 +520,7 @@ HealthcareServiceProvider process(HealthcareServiceProvider.Command cmd) throws 
     <id>Relation</id>
     <coordinates>
       <x>918</x>
-      <y>738</y>
+      <y>624</y>
       <w>96</w>
       <h>18</h>
     </coordinates>
@@ -531,7 +531,7 @@ HealthcareServiceProvider process(HealthcareServiceProvider.Command cmd) throws 
     <id>Relation</id>
     <coordinates>
       <x>1596</x>
-      <y>138</y>
+      <y>24</y>
       <w>192</w>
       <h>150</h>
     </coordinates>
@@ -545,7 +545,7 @@ m2=0..1
     <id>Relation</id>
     <coordinates>
       <x>1554</x>
-      <y>300</y>
+      <y>186</y>
       <w>42</w>
       <h>222</h>
     </coordinates>
@@ -559,7 +559,7 @@ m2=0..1
     <id>Relation</id>
     <coordinates>
       <x>1368</x>
-      <y>288</y>
+      <y>174</y>
       <w>174</w>
       <h>120</h>
     </coordinates>
@@ -573,7 +573,7 @@ m2=0..1
     <id>Relation</id>
     <coordinates>
       <x>1470</x>
-      <y>300</y>
+      <y>186</y>
       <w>96</w>
       <h>222</h>
     </coordinates>
@@ -587,7 +587,7 @@ m2=0..1
     <id>Relation</id>
     <coordinates>
       <x>1368</x>
-      <y>138</y>
+      <y>24</y>
       <w>174</w>
       <h>150</h>
     </coordinates>
@@ -601,7 +601,7 @@ m2=0..1
     <id>Relation</id>
     <coordinates>
       <x>1368</x>
-      <y>270</y>
+      <y>156</y>
       <w>174</w>
       <h>30</h>
     </coordinates>
@@ -615,7 +615,7 @@ m2=0..1
     <id>Relation</id>
     <coordinates>
       <x>1596</x>
-      <y>270</y>
+      <y>156</y>
       <w>192</w>
       <h>30</h>
     </coordinates>
@@ -629,7 +629,7 @@ m2=0..1
     <id>Relation</id>
     <coordinates>
       <x>1596</x>
-      <y>288</y>
+      <y>174</y>
       <w>192</w>
       <h>120</h>
     </coordinates>
@@ -643,7 +643,7 @@ m2=0..1
     <id>Relation</id>
     <coordinates>
       <x>666</x>
-      <y>336</y>
+      <y>222</y>
       <w>78</w>
       <h>30</h>
     </coordinates>
@@ -657,7 +657,7 @@ m2=1
     <id>Relation</id>
     <coordinates>
       <x>816</x>
-      <y>222</y>
+      <y>108</y>
       <w>30</w>
       <h>66</h>
     </coordinates>
@@ -671,7 +671,7 @@ m2=1
     <id>Relation</id>
     <coordinates>
       <x>366</x>
-      <y>366</y>
+      <y>252</y>
       <w>138</w>
       <h>30</h>
     </coordinates>
@@ -685,7 +685,7 @@ m2=1
     <id>Relation</id>
     <coordinates>
       <x>666</x>
-      <y>408</y>
+      <y>294</y>
       <w>168</w>
       <h>42</h>
     </coordinates>
