@@ -18,6 +18,7 @@ public record TransportDetails (
 		Optional<Direction> direction,
 		Optional<PatientCondition> patientCondition,
 		Reference<ServiceProvider> transportProvider,
+		Optional<String> tourNumber,
 		Optional<Boolean> paymentExemption,
 		Optional<String> patientSignature,
 		Optional<Date> patientSignatureDate,
@@ -42,6 +43,7 @@ public record TransportDetails (
 			Optional<Reference<Adress>> endAdress,
 			Optional<Direction> direction,
 			Optional<PatientCondition> patientCondition,
+			Optional<String> tourNumber,
 			Optional<Boolean> paymentExemption,
 			Optional<String> patientSignature,
 			Optional<Date> patientSignatureDate,
@@ -49,11 +51,12 @@ public record TransportDetails (
 			Optional<Date> transporterSignatureDate) implements Command {
 	}
 
-	public static record Filter(Optional<Reference<Adress>> startAdress,
-			Optional<Reference<Adress>> endAdress,
-			Optional<Direction> direction, Optional<Date> transportDate, 
-			Optional<Reference<ServiceProvider>> insurance, 
-			Optional<Reference<TransportDocument>> transportDocument) {
+	public static record Filter(
+			Optional<Reference<TransportDocument>> transportDocument,
+			Optional<Date> transportDate, 
+			Optional<Reference<Adress>> adress,
+			Optional<Direction> direction,
+			Optional<Reference<ServiceProvider>> transportProvider) {
 	}
 
 	public static interface Operations {
@@ -69,6 +72,7 @@ public record TransportDetails (
 			Optional<Reference<Adress>>newEndAdress,
 			Optional<Direction> newDirection,
 			Optional<PatientCondition> newPatientCondition,
+			Optional<String> newTourNumber,
 			Optional<Boolean> newPaymentExemption) {
 		return new TransportDetails(
 				this.id, 
@@ -79,7 +83,8 @@ public record TransportDetails (
 				newDirection, 
 				newPatientCondition,
 				this.transportProvider,
-				newPaymentExemption, 
+				newTourNumber,
+				newPaymentExemption,
 				this.patientSignature, 
 				this.patientSignatureDate,
 				this.transporterSignature,
@@ -98,6 +103,7 @@ public record TransportDetails (
 				this.direction, 
 				this.patientCondition,
 				this.transportProvider,
+				this.tourNumber,
 				this.paymentExemption, 
 				Optional.of(newPatientSignature), 
 				Optional.of(newPatientSignatureDate),
@@ -117,6 +123,7 @@ public record TransportDetails (
 				this.direction, 
 				this.patientCondition,
 				this.transportProvider,
+				this.tourNumber,
 				this.paymentExemption, 
 				this.patientSignature, 
 				this.patientSignatureDate,
@@ -128,7 +135,7 @@ public record TransportDetails (
 		return String.format(
 				"TransportDetails[id=%S, transportDocument=%S, transportDate=%S, startAdress=%S, "
 				+ "endAdress=%S, direction=%S, patientCondition=%S, transportProvider=%S, "
-				+ "paymentExemption=%S, patientSignature=%S, patientSignatureDate=%S, "
+				+ "tourNumber=%s, paymentExemption=%S, patientSignature=%S, patientSignatureDate=%S, "
 				+ "transporterSignature=%S, transporterSignatureDate=%s]", 
 				id,
 				transportDocument.toString(),
@@ -138,6 +145,7 @@ public record TransportDetails (
 				direction.toString(),
 				patientCondition.toString(),
 				transportProvider.toString(),
+				tourNumber,
 				paymentExemption.toString(),
 				patientSignature,
 				patientSignatureDate.toString(),

@@ -13,7 +13,6 @@ public record User(
 		String firstName,
 		Reference<Adress> adress,
 		String userName,
-		String password,
 		Reference<ServiceProvider> serviceProvider,
 		UserRole role
 		) {
@@ -26,7 +25,6 @@ public record User(
 			String firstName,
 			Reference<Adress> adress,
 			String userName,
-			String password,
 			Reference<ServiceProvider> serviceProvider,
 			UserRole role) implements Command{	
 	}
@@ -40,7 +38,6 @@ public record User(
 			String firstName,
 			Reference<Adress> adress,
 			String userName,
-			String password,
 			Reference<ServiceProvider> serviceProvider
 			) implements Command{
 	}
@@ -65,33 +62,27 @@ public record User(
 			String newLastName,
 			String newFirstName,
 			Reference<Adress> newAdress,
+			String userName,
 			Reference<ServiceProvider> newServiceProvider,
 			UserRole newRole) {
 		return new User(this.id, newLastName, newFirstName, newAdress, 
-				this.userName, this.password, newServiceProvider, newRole);
+				userName, newServiceProvider, newRole);
 	}
 	
-	public User updateLogin(
-			String newUserName,
-			String newPassword) {
-		return new User(this.id, this.lastName, this.firstName, this.adress, 
-				newUserName, newPassword, this.serviceProvider, this.role);
-	}
+	
 	
 	
 	
 	public String toString() {
 		return String.format(
 				"User[id=%s, lastName=%s, firstName=%s, "
-				+ "adress=%s, userName=%s, "
-				+ "password=*****, serviceProvider=%s, "
+				+ "adress=%s, userName=%s, serviceProvider=%s, "
 				+ "role=%s]", 
 				id,
 				lastName,
 				firstName,
 				adress.toString(),
 				userName,
-				password,
 				serviceProvider.toString(),
 				role.toString());
 	}

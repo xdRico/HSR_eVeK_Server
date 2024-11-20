@@ -13,11 +13,11 @@ public record TransportDocument(
 		Id<TransportDocument> id,
 		Optional<Reference<Patient>> patient,
 		Reference<InsuranceData> insuranceData,
-		TransportReason reason,
+		TransportReason transportReason,
 		Date startDate,
 		Optional<Date> endDate,
 		Optional<Integer> weeklyFrequency,
-		Reference<ServiceProvider> serviceProvider,
+		Reference<ServiceProvider> healthcareServiceProvider,
 		TransportationType transportationType,
 		Optional<String> additionalInfo,
 		Reference<User> signature) {
@@ -28,11 +28,11 @@ public record TransportDocument(
 	public static record Create(
 			Optional<Reference<Patient>> patient,
 			Reference<InsuranceData> insuranceData,
-			TransportReason reason,
+			TransportReason transportReason,
 			Date startDate,
 			Optional<Date> endDate,
 			Optional<Integer> weeklyFrequency,
-			Reference<ServiceProvider> serviceProvider,
+			Reference<ServiceProvider> healthcareServiceProvider,
 			TransportationType transportationType,
 			Optional<String> additionalInfo,
 			Reference<User> signature) implements Command {
@@ -45,11 +45,11 @@ public record TransportDocument(
 			Id<TransportDocument> id,
 			Optional<Reference<Patient>> patient,
 			Reference<InsuranceData> insuranceData,
-			TransportReason reason,
+			TransportReason transportReason,
 			Date startDate,
 			Optional<Date> endDate,
 			Optional<Integer> weeklyFrequency,
-			Reference<ServiceProvider> serviceProvider,
+			Reference<ServiceProvider> healthcareServiceProvider,
 			TransportationType transportationType,
 			Optional<String> additionalInfo,
 			Reference<User> signature) implements Command {
@@ -58,7 +58,7 @@ public record TransportDocument(
 	public static record Filter(Optional<Reference<Patient>> patient,
 			Optional<InsuranceData> insuranceData,
 			Optional<Date> startDate, Optional<Date> endDate,
-			Optional<Reference<ServiceProvider>> serviceProvider,
+			Optional<Reference<ServiceProvider>> healthcareServiceProvider,
 			Optional<TransportationType> transportationType,
 			Optional<Reference<User>> signature) {
 	}
@@ -71,7 +71,7 @@ public record TransportDocument(
 		TransportDocument getTransportDocument(Id<TransportDocument> id);
 	}
 
-	public TransportDocument updateWith(TransportReason newReason,
+	public TransportDocument updateWith(TransportReason newTransportReason,
 			Date newStartDate, Optional<Date> newEndDate,
 			Optional<Integer> newWeeklyFrequency,
 			Reference<ServiceProvider> newServiceProvider,
@@ -79,7 +79,7 @@ public record TransportDocument(
 			Optional<String> newAdditionalInfo) {
 		
 		return new TransportDocument(
-				this.id, this.patient, insuranceData, newReason, 
+				this.id, this.patient, insuranceData, newTransportReason, 
 				newStartDate, newEndDate, newWeeklyFrequency, 
 				newServiceProvider, newTransportationType, 
 				newAdditionalInfo, this.signature);
@@ -91,9 +91,9 @@ public record TransportDocument(
 		return new TransportDocument(
 				this.id, Optional.of(newPatient), 
 				newInsuranceData,
-				this.reason, this.startDate, 
+				this.transportReason, this.startDate, 
 				this.endDate, this.weeklyFrequency, 
-				this.serviceProvider, 
+				this.healthcareServiceProvider, 
 				this.transportationType, 
 				this.additionalInfo, this.signature);
 	}
@@ -102,9 +102,9 @@ public record TransportDocument(
 		return new TransportDocument(
 				this.id, this.patient,
 				this.insuranceData,
-				this.reason, this.startDate, 
+				this.transportReason, this.startDate, 
 				this.endDate, this.weeklyFrequency, 
-				this.serviceProvider, 
+				this.healthcareServiceProvider, 
 				this.transportationType, 
 				this.additionalInfo, newSignature);
 	}
@@ -112,13 +112,13 @@ public record TransportDocument(
 	
 	public String toString() {
 		return String.format(
-				"TransportDocument[id=%s, patient=%s, insuranceData=%s, reason=%s, "
+				"TransportDocument[id=%s, patient=%s, insuranceData=%s, transportReason=%s, "
 				+ "startDate=%s, endDate=%s, weeklyFrequency=%d, "
-				+ "serviceProvider=%s, transportationType=%s, "
+				+ "healthcareServiceProvider=%s, transportationType=%s, "
 				+ "additionalInfo=%s, signature=%s]", 
 				id, patient.toString(), insuranceData.toString(), 
-				reason.toString(), startDate.toString(), endDate.toString(),
-				weeklyFrequency, serviceProvider.toString(), 
+				transportReason.toString(), startDate.toString(), endDate.toString(),
+				weeklyFrequency, healthcareServiceProvider.toString(), 
 				transportationType.toString(), additionalInfo.toString(), 
 				signature.toString());
 	}

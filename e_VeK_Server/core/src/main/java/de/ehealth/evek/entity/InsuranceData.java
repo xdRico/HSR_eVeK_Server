@@ -8,7 +8,7 @@ import de.ehealth.evek.type.Reference;
 
 public record InsuranceData(
 		Id<InsuranceData> id, 
-		Reference<Patient> insuranceNumber,
+		Reference<Patient> patient,
 		Reference<Insurance> insurance, 
 		int insuranceStatus) {
 	
@@ -16,7 +16,7 @@ public record InsuranceData(
 	}
 	
 	public static record Create(
-			Reference<Patient> insuranceNumber,
+			Reference<Patient> patient,
 			Reference<Insurance> insurance, 
 			int insuranceStatus) implements Command {
 	}
@@ -25,7 +25,7 @@ public record InsuranceData(
 	}
 
 	public static record Filter(
-			Optional<Reference<Patient>> insuranceNumber,
+			Optional<Reference<Patient>> patient,
 			Optional<Reference<Insurance>> insurance) {
 	}
 
@@ -39,10 +39,10 @@ public record InsuranceData(
 	
 	public String toString() {
 		return String.format(
-				"InsuranceData[id=%s, insuranceNumber=%s, insurance=%s, "
+				"InsuranceData[id=%s, patient=%s, insurance=%s, "
 				+ "insuranceStatus=%d]", 
 				id, 
-				insuranceNumber.id(),
+				patient.id(),
 				insurance.toString(), 
 				insuranceStatus);
 	}
