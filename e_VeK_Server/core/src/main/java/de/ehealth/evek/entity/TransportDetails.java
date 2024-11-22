@@ -26,31 +26,48 @@ public record TransportDetails (
 		Optional<Date> transporterSignatureDate
 		) {
 
-	public static sealed interface Command permits Create, Delete, Update{
+	public static sealed interface Command permits Create, Delete, Update, UpdatePatientSignature, UpdateTransporterSignature{
 	}
 
 	public static record Create( Id<TransportDetails> id, 
-			Reference<TransportDocument> transportDocument, Date transportDate, 
-			Reference<ServiceProvider> transportProvider
+			Reference<TransportDocument> transportDocument, 
+			Date transportDate, 
+			Optional<Reference<Adress>> startAdress,
+			Optional<Reference<Adress>> endAdress,
+			Optional<Direction> direction,
+			Optional<PatientCondition> patientCondition,
+			Reference<ServiceProvider> transportProvider,
+			Optional<String> tourNumber,
+			Optional<Boolean> paymentExemption,
+			Optional<String> patientSignature,
+			Optional<Date> patientSignatureDate,
+			Optional<String> transporterSignature,
+			Optional<Date> transporterSignatureDate
 			) implements Command {
 	}
 
 	public static record Delete(Id<TransportDetails> id) implements Command {
 	}
 
-	public static record Update(
+	public static record Update(Id<TransportDetails> id,
 			Optional<Reference<Adress>> startAdress,
 			Optional<Reference<Adress>> endAdress,
 			Optional<Direction> direction,
 			Optional<PatientCondition> patientCondition,
 			Optional<String> tourNumber,
-			Optional<Boolean> paymentExemption,
-			Optional<String> patientSignature,
-			Optional<Date> patientSignatureDate,
-			Optional<String> transporterSignature,
-			Optional<Date> transporterSignatureDate) implements Command {
+			Optional<Boolean> paymentExemption) implements Command {
 	}
 
+	public static record UpdatePatientSignature(Id<TransportDetails> id,
+			String patientSignature,
+			Date patientSignatureDate) implements Command {
+	}
+	
+	public static record UpdateTransporterSignature(Id<TransportDetails> id,
+			String transporterSignature,
+			Date transporterSignatureDate) implements Command {
+	}
+	
 	public static record Filter(
 			Optional<Reference<TransportDocument>> transportDocument,
 			Optional<Date> transportDate, 

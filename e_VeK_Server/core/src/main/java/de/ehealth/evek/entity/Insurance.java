@@ -15,7 +15,7 @@ public record Insurance(
 	public static sealed interface Command permits Create, Delete, Move, Update {
 	}
 
-	public static record Create(String name, Reference<Adress> adress) implements Command {
+	public static record Create(String insuranceId, String name, Reference<Adress> adress) implements Command {
 	}
 
 	public static record Delete(Id<Insurance> id) implements Command {
@@ -41,8 +41,12 @@ public record Insurance(
 		Insurance getInsurance(Id<Insurance> id);
 	}
 
-	public Insurance updateWith(String newName, Reference<Adress> newAdress) {
-		return new Insurance(this.id, newName, newAdress);
+	public Insurance updateWith(String newName) {
+		return new Insurance(this.id, newName, this.adress);
+	}
+	
+	public Insurance updateWith(Reference<Adress> newAdress) {
+		return new Insurance(this.id, this.name, newAdress);
 	}
 	
 	public String toString() {

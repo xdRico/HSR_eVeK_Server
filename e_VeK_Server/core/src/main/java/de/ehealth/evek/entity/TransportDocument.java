@@ -22,7 +22,7 @@ public record TransportDocument(
 		Optional<String> additionalInfo,
 		Reference<User> signature) {
 	
-	public static sealed interface Command permits Create, Update, Delete{
+	public static sealed interface Command permits Create, Update, AssignPatient, Delete{
 	}
 	
 	public static record Create(
@@ -43,8 +43,6 @@ public record TransportDocument(
 
 	public static record Update(
 			Id<TransportDocument> id,
-			Optional<Reference<Patient>> patient,
-			Reference<InsuranceData> insuranceData,
 			TransportReason transportReason,
 			Date startDate,
 			Optional<Date> endDate,
@@ -53,6 +51,12 @@ public record TransportDocument(
 			TransportationType transportationType,
 			Optional<String> additionalInfo,
 			Reference<User> signature) implements Command {
+	}
+	
+	public static record AssignPatient(
+			Id<TransportDocument> id,
+			Reference<Patient> patient,
+			Reference<InsuranceData> insuranceData) implements Command {
 	}
 
 	public static record Filter(Optional<Reference<Patient>> patient,
@@ -71,18 +75,21 @@ public record TransportDocument(
 		TransportDocument getTransportDocument(Id<TransportDocument> id);
 	}
 
-	public TransportDocument updateWith(TransportReason newTransportReason,
-			Date newStartDate, Optional<Date> newEndDate,
+	public TransportDocument updateWith(
+			TransportReason newTransportReason,
+			Date newStartDate, 
+			Optional<Date> newEndDate,
 			Optional<Integer> newWeeklyFrequency,
 			Reference<ServiceProvider> newServiceProvider,
 			TransportationType newTransportationType,
-			Optional<String> newAdditionalInfo) {
+			Optional<String> newAdditionalInfo,
+			Reference<User> newSignature) {
 		
 		return new TransportDocument(
 				this.id, this.patient, insuranceData, newTransportReason, 
 				newStartDate, newEndDate, newWeeklyFrequency, 
 				newServiceProvider, newTransportationType, 
-				newAdditionalInfo, this.signature);
+				newAdditionalInfo, newSignature);
 	}
 	
 	public TransportDocument assignPatient(

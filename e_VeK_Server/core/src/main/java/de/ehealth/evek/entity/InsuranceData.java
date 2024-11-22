@@ -34,7 +34,7 @@ public record InsuranceData(
 
 		List<InsuranceData> getInsuranceData(Filter filter);
 
-		TransportDocument getInsuranceData(Id<InsuranceData> id);
+		InsuranceData getInsuranceData(Id<InsuranceData> id);
 	}
 	
 	public String toString() {

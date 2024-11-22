@@ -17,7 +17,7 @@ public record Patient (
 	public static sealed interface Command permits Create, Delete, Move, Update{
 	}
 
-	public static record Create(Id<Patient> insuranceNumber, 
+	public static record Create(String insuranceNumber, 
 			Reference<InsuranceData> insuranceData, String lastName,
 			String firstName, Date birthDate, Reference<Adress> adress) implements Command {
 	}
@@ -51,6 +51,10 @@ public record Patient (
 	public Patient updateWith(Reference<InsuranceData> newInsuranceData, 
 			String newLastName, String newFirstName, Reference<Adress> newAdress) {
 		return new Patient(this.insuranceNumber, newInsuranceData, newLastName, newFirstName, this.birthDate, newAdress);
+	}
+	
+	public Patient updateWith(Reference<Adress> newAdress) {
+		return new Patient(this.insuranceNumber, this.insuranceData, this.lastName, this.firstName, this.birthDate, newAdress);
 	}
 	
 	public String toString() {

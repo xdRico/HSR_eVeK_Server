@@ -42,7 +42,7 @@ public record User(
 			) implements Command{
 	}
 	
-	public static record UpdateRole(UserRole role) implements Command{	
+	public static record UpdateRole(Id<User> id, UserRole role) implements Command{	
 	}
 	
 	public static record Filter(Optional<String> lastName, Optional<String> firstName, 
@@ -55,22 +55,25 @@ public record User(
 
 		List<User> getUser(Filter filter);
 
-		ServiceProvider getUser(Id<User> id);
+		User getUser(Id<User> id);
 	}
 
 	public User updateWith(
 			String newLastName,
 			String newFirstName,
 			Reference<Adress> newAdress,
-			String userName,
-			Reference<ServiceProvider> newServiceProvider,
-			UserRole newRole) {
+			String newUserName,
+			Reference<ServiceProvider> newServiceProvider) {
 		return new User(this.id, newLastName, newFirstName, newAdress, 
-				userName, newServiceProvider, newRole);
+				newUserName, newServiceProvider, this.role);
 	}
 	
 	
 	
+	public User updateWith(UserRole newRole) {
+		return new User(this.id, this.lastName, this.firstName, this.adress, 
+				this.userName, this.serviceProvider, newRole);
+	}
 	
 	
 	public String toString() {
