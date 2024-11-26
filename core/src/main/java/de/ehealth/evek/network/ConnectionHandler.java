@@ -1,4 +1,4 @@
-package de.ehealth.evek.core;
+package de.ehealth.evek.network;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -9,7 +9,7 @@ import de.ehealth.evek.data.ITransportManagementService;
 import de.ehealth.evek.util.Debug;
 import de.ehealth.evek.util.Log;
 
-class ConnectionHandler implements Runnable{
+public class ConnectionHandler implements Runnable{
 
 	private boolean initialized = false;
 	private boolean serverRunning = false;
@@ -28,14 +28,14 @@ class ConnectionHandler implements Runnable{
 		}
 	}
 	
-	boolean startServer()  throws IOException{
+	public boolean startServer()  throws IOException{
 		Log.sendMessage("Starting Server...");
 		if(!initialized) {
-			Log.sendMessage("Server has not been started!");
+			Log.sendMessage("Server could not be started!");
 			Log.sendMessage(" - Server has not been initialized yet!");
 			return false; 
 		}
-		Log.sendMessage("	Setting up Server Socket...");
+		Log.sendMessage(String.format("	Setting up Server Socket on Port %d...", port));
 		serverSocket = new ServerSocket(port);
 		Log.sendMessage("	Starting up WaiterThread...");
 		waiterThread = new Thread(this);
@@ -45,7 +45,7 @@ class ConnectionHandler implements Runnable{
 		return true;
 	}
 	
-	void stopServer(){
+	public void stopServer(){
 		serverRunning = false;
 		
 	}
@@ -55,6 +55,7 @@ class ConnectionHandler implements Runnable{
 			Log.sendMessage("Waiting for Client Connection...");
 			ClientConnection client = new ClientConnection(serverSocket.accept(), 
 					transportManagementService);
+			client.start();
 			clientConnections.add(client);
 			Log.sendMessage("A Connection has been established!");
 			Log.sendMessage(String.format("	Connection: %s", client.toString()));
@@ -65,7 +66,7 @@ class ConnectionHandler implements Runnable{
 		}
 	}
 	
-	boolean setService(ITransportManagementService transportManagementService) {
+	public boolean setService(ITransportManagementService transportManagementService) {
 		if(transportManagementService == null)
 			return false;
 		this.transportManagementService = transportManagementService;
@@ -73,7 +74,7 @@ class ConnectionHandler implements Runnable{
 		return true;
 	}
 	
-	boolean setPort(int port) throws IllegalArgumentException{
+	public boolean setPort(int port) throws IllegalArgumentException{
 		if(port < 1024 || port > 65535) throw new IllegalArgumentException("Port out of range!");
 		if(serverRunning || this.port == port) return false;
 		this.port = port;

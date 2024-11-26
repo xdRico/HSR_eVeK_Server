@@ -1,5 +1,6 @@
 package de.ehealth.evek.entity;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,7 +11,8 @@ public record Insurance(
 		Id<Insurance> id,
 		// ToDo type field?
 		String name,
-		Reference<Adress> adress) {
+		Reference<Adress> adress
+		) implements Serializable {
 	
 	public static sealed interface Command permits Create, Delete, Move, Update {
 	}

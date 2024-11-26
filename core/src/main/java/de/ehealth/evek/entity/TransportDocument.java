@@ -1,5 +1,6 @@
 package de.ehealth.evek.entity;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +21,8 @@ public record TransportDocument(
 		Reference<ServiceProvider> healthcareServiceProvider,
 		TransportationType transportationType,
 		Optional<String> additionalInfo,
-		Reference<User> signature) {
+		Reference<User> signature
+		) implements Serializable{
 	
 	public static sealed interface Command permits Create, Update, AssignPatient, Delete{
 	}

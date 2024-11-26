@@ -1,5 +1,6 @@
 package de.ehealth.evek.entity;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +13,8 @@ public record Patient (
 		String lastName,
 		String firstName,
 		Date birthDate,
-		Reference<Adress> adress){
+		Reference<Adress> adress
+		) implements Serializable {
 
 	public static sealed interface Command permits Create, Delete, Move, Update{
 	}

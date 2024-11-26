@@ -1,5 +1,6 @@
 package de.ehealth.evek.entity;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +16,7 @@ public record User(
 		String userName,
 		Reference<ServiceProvider> serviceProvider,
 		UserRole role
-		) {
+		) implements Serializable {
 
 	public static sealed interface Command permits Create, Update, Delete, UpdateRole {		
 	}

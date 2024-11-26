@@ -1,5 +1,6 @@
 package de.ehealth.evek.entity;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,7 +11,8 @@ public record InsuranceData(
 		Id<InsuranceData> id, 
 		Reference<Patient> patient,
 		Reference<Insurance> insurance, 
-		int insuranceStatus) {
+		int insuranceStatus
+		) implements Serializable {
 	
 	public static sealed interface Command permits Create, Delete{
 	}

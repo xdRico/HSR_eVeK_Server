@@ -1,5 +1,6 @@
 package de.ehealth.evek.entity;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,7 +13,8 @@ public record Adress(
 		String houseNumber,
 		String country,
 		String postCode,
-		String city) {
+		String city
+		) implements Serializable {
 
 	public static sealed interface Command permits Create, Delete, Update{
 	}

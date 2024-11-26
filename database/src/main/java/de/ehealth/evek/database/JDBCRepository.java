@@ -138,7 +138,7 @@ public class JDBCRepository implements IRepository {
 		private static final String CREATE_TABLE_PATIENT = """
 			CREATE TABLE IF NOT EXISTS "patient" (
 					"patientId" UUID NOT NULL PRIMARY KEY,
-					"insuranceData" UUID NOT NULL REFERENCES "insuranceData"("insuranceDataId"),
+					"insuranceData" UUID REFERENCES "insuranceData"("insuranceDataId"),
 					"lastName" VARCHAR(127) NOT NULL,
 					"firstName" VARCHAR(63) NOT NULL,
 					"birthDate" DATE NOT NULL,
@@ -206,11 +206,6 @@ public class JDBCRepository implements IRepository {
 					"role" VARCHAR(63)
 				);
 				""";
-
-		private static final String ALTER_TABLE_INSURANCEDATA = """
-			ALTER TABLE IF EXISTS "insuranceData"
-					ADD FOREIGN KEY ("patient") REFERENCES "patient"("patientId");
-				""";	
 		
 //		private static String insertSQL(Invoice invoice) {
 //			 return INSERT_INTO("invoice")
@@ -260,7 +255,6 @@ public class JDBCRepository implements IRepository {
 				stmt.execute(CREATE_TABLE_USER);
 				stmt.execute(CREATE_TABLE_TRANSPORTDOCUMENT);
 				stmt.execute(CREATE_TABLE_TRANSPORTDETAILS);
-				stmt.execute(ALTER_TABLE_INSURANCEDATA);
 
 				
 			} catch (SQLException e) {
