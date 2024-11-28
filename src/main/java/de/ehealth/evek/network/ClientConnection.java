@@ -9,8 +9,8 @@ import de.ehealth.evek.util.Log;
 class ClientConnection {
 
 	private final Socket client;	
-	private final ComReceiver receiver;
-	private final ComSender sender;
+	private final ComServerReceiver receiver;
+	private final ComServerSender sender;
 	private ITransportManagementService transportManagementService;
 	
 	
@@ -20,8 +20,8 @@ class ClientConnection {
 		this.transportManagementService = transportManagementService;
 		try {
 			Log.sendMessage(String.format("A Connection has been requested by %s:%s!", client.getInetAddress(), client.getPort()));
-			this.sender = new ComSender(client);
-			this.receiver = new ComReceiver(client, transportManagementService);
+			this.sender = new ComServerSender(client);
+			this.receiver = new ComServerReceiver(client, transportManagementService, sender);
 			Log.sendMessage(String.format("	Client Connection[%s] has been successfully established!", toString()));
 		} catch (IOException e) {
 			Log.sendMessage(String.format("	Client Connection[%s] could not be established!", toString()));

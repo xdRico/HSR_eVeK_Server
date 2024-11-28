@@ -13,29 +13,28 @@ public record User(
 		String lastName,
 		String firstName,
 		Reference<Address> address,
-		String userName,
 		Reference<ServiceProvider> serviceProvider,
 		UserRole role
 		) implements Serializable {
 
-	public static sealed interface Command extends Serializable permits Create, CreateFull, Update, Delete, UpdateRole {		
+	public static sealed interface Command extends Serializable permits Create, CreateFull, Update, Delete, UpdateRole, LoginUser {		
 	}
 	
 	
 	public static record Create(
+			String userName,
 			String lastName,
 			String firstName,
 			Reference<Address> address,
-			String userName,
 			Reference<ServiceProvider> serviceProvider,
 			UserRole role) implements Command{	
 	}
 	
 	public static record CreateFull(
+			String userName,
 			String lastName,
 			String firstName,
 			Address.Create addressCmd,
-			String userName,
 			ServiceProvider.CreateFull serviceProviderCmd,
 			UserRole role) implements Command{	
 	}
@@ -48,16 +47,17 @@ public record User(
 			String lastName,
 			String firstName,
 			Reference<Address> address,
-			String userName,
 			Reference<ServiceProvider> serviceProvider
 			) implements Command{
 	}
 	
 	public static record UpdateRole(Id<User> id, UserRole role) implements Command{	
 	}
+	public static record LoginUser(String userName, String password) implements Command{	
+	}
 	
 	public static record Filter(COptional<String> lastName, COptional<String> firstName, 
-			COptional<Reference<Address>> address, COptional<String> userName,
+			COptional<Reference<Address>> address,
 			COptional<Reference<ServiceProvider>> serviceProvider, COptional<UserRole> role) {
 	}
 
@@ -73,30 +73,28 @@ public record User(
 			String newLastName,
 			String newFirstName,
 			Reference<Address> newAddress,
-			String newUserName,
 			Reference<ServiceProvider> newServiceProvider) {
 		return new User(this.id, newLastName, newFirstName, newAddress, 
-				newUserName, newServiceProvider, this.role);
+				newServiceProvider, this.role);
 	}
 	
 	
 	
 	public User updateWith(UserRole newRole) {
 		return new User(this.id, this.lastName, this.firstName, this.address, 
-				this.userName, this.serviceProvider, newRole);
+				this.serviceProvider, newRole);
 	}
 	
 	
 	public String toString() {
 		return String.format(
 				"User[id=%s, lastName=%s, firstName=%s, "
-				+ "address=%s, userName=%s, serviceProvider=%s, "
+				+ "address=%s, serviceProvider=%s, "
 				+ "role=%s]", 
 				id,
 				lastName,
 				firstName,
 				address.toString(),
-				userName,
 				serviceProvider.toString(),
 				role.toString());
 	}

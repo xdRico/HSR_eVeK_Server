@@ -112,7 +112,7 @@ public interface IRepository {
 	 * 
 	 * @return ID - the created ID for the User
 	 */
-	Id<User> UserID();
+	Id<User> UserID(String userName);
 	
 	
 	
@@ -530,6 +530,15 @@ public interface IRepository {
 	 */
 	COptional<User> getUser(Id<User> id);
 	
+	/**
+	 * getUser
+	 * 
+	 * Method to get an User by its ID
+	 * 
+	 * @param id - the id of the User as String
+	 * @return User - the User with the given ID
+	 */
+	COptional<User> getUser(String id);
 	
 	
 	

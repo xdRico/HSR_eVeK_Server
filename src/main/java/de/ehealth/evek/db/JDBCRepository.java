@@ -194,52 +194,25 @@ public class JDBCRepository implements IRepository {
 					"healthcareServiceProvider" VARCHAR(9) NOT NULL REFERENCES "serviceProvider"("serviceProviderId"),
 					"transportationType" VARCHAR(15) NOT NULL,
 					"additionalInfo" VARCHAR(255),
-					"signature" UUID NOT NULL REFERENCES "user"("userId")
+					"signature" VARCHAR(63) NOT NULL REFERENCES "user"("userId")
 				);
 				""";
 
 		private static final String CREATE_TABLE_USER = """
 			CREATE TABLE IF NOT EXISTS "user" (
-					"userId" UUID NOT NULL PRIMARY KEY,
+					"userId" VARCHAR(63) NOT NULL PRIMARY KEY,
 					"lastName" VARCHAR(127),
 					"firstName" VARCHAR(63),
 					"address" UUID NOT NULL REFERENCES "address"("addressId"),
-					"userName" VARCHAR(63) NOT NULL,
 					"serviceProvider" VARCHAR(9) NOT NULL REFERENCES "serviceProvider"("serviceProviderId"),
 					"role" VARCHAR(63)
 				);
 				""";
 		
-//		private static String insertSQL(Invoice invoice) {
-//			 return INSERT_INTO("invoice")
-//					 .VALUE("...", invoice.toString())
-//					 .toString();
-//		}
-//		/**
-//		 * static insertSQL
-//		 * 
-//		 * Method returning the SQL Command for inserting a Protocol to the database 
-//		 * 
-//		 * @param protocol - the Protocol to be added
-//		 * @return String - the SQL Command as String
-//		 */
-//		private static String insertSQL(Protocol protocol) {
-//			 return INSERT_INTO("protocol")
-//					 .VALUE("...", protocol.toString())
-//					 .toString();
-//		}
 		
 		
 		
 		
-		
-		
-		
-		
-		
-		
-		
-
 		/**
 		 * setup
 		 * 
@@ -505,7 +478,6 @@ public class JDBCRepository implements IRepository {
 					 .VALUE("lastName", user.lastName())
 					 .VALUE("firstName", user.firstName())
 					 .VALUE("address", user.address().id().value().toString())
-					 .VALUE("userName", user.userName())
 					 .VALUE("serviceProvider", user.serviceProvider().id().value().toString())
 					 .VALUE("role", user.role())
 					 .toString();
@@ -753,7 +725,6 @@ public class JDBCRepository implements IRepository {
 					 .SET("lastName", user.lastName())
 					 .SET("firstName", user.firstName())
 					 .SET("address", user.address().id().value().toString())
-					 .SET("userName", user.userName())
 					 .SET("serviceProvider", user.serviceProvider().id().value().toString())
 					 .SET("role", user.role())
 					 .toString();
@@ -1025,7 +996,7 @@ public class JDBCRepository implements IRepository {
 			return new ServiceProvider(new Id<>(rs.getString("serviceProviderId")), 
 					rs.getString("name"),
 					rs.getString("type"),
-					rs.getBoolean("isHelathcareProvider"),
+					rs.getBoolean("isHealthcareProvider"),
 					rs.getBoolean("isTransportProvider"),
 					Reference.to(rs.getString("address")),
 					contactInfo);
@@ -1163,7 +1134,6 @@ public class JDBCRepository implements IRepository {
 					rs.getString("lastName"),
 					rs.getString("firstName"),
 					Reference.to(rs.getString("address")),
-					rs.getString("userName"),
 					Reference.to(rs.getString("serviceProvider")),
 					UserRole.valueOf(rs.getString("role")));
 		}	
@@ -1218,8 +1188,8 @@ public class JDBCRepository implements IRepository {
 		}
 		
 		@Override
-		public Id<User> UserID() {
-			return new Id<>(UUID.randomUUID().toString());
+		public Id<User> UserID(String userName) {
+			return new Id<>(userName);
 		}
 		
 		
@@ -1657,7 +1627,6 @@ public class JDBCRepository implements IRepository {
 			filter.lastName().ifPresent(ref -> query.WHERE("lastName", ref));
 			filter.firstName().ifPresent(ref -> query.WHERE("firstName", ref));
 			filter.address().ifPresent(ref -> query.WHERE("address", ref.id().value()));
-			filter.userName().ifPresent(ref -> query.WHERE("userName", ref));
 			filter.serviceProvider().ifPresent(ref -> query.WHERE("serviceProvider", ref.id().value()));
 			filter.role().ifPresent(ref -> query.WHERE("role", ref));
 
@@ -1799,6 +1768,19 @@ public class JDBCRepository implements IRepository {
 		public COptional<User> getUser(Id<User> id) {
 			try (var stmt = conn.createStatement();
 					var rs = stmt.executeQuery(selectAllSQL("user", "userId", id.value()))) {
+				if(!rs.isClosed())
+					if (rs.next()) 
+						return COptional.of(readUser(rs));
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+			return COptional.empty();
+		}
+		
+		@Override
+		public COptional<User> getUser(String id) {
+			try (var stmt = conn.createStatement();
+					var rs = stmt.executeQuery(selectAllSQL("user", "userId", id))) {
 				if(!rs.isClosed())
 					if (rs.next()) 
 						return COptional.of(readUser(rs));

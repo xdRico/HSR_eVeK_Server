@@ -1,4 +1,4 @@
-package de.ehealth.evek.network;
+package de.ehealth.evek.network.interfaces;
 
 import de.ehealth.evek.entity.Address;
 import de.ehealth.evek.entity.Insurance;
@@ -10,14 +10,14 @@ import de.ehealth.evek.entity.TransportDocument;
 import de.ehealth.evek.entity.User;
 import de.ehealth.evek.util.Log;
 
-public interface IComReceiver {
+public interface IComServerReceiver {
 
 	default boolean receiveObject(Object inputObject) throws Exception {
 		if(customHandleInput(inputObject))
 			return true;
 		
-		if(inputObject instanceof User) 
-			return setProcessingUser((User) inputObject);
+		if(inputObject instanceof User.LoginUser) 
+			return setProcessingUser((User.LoginUser) inputObject);
 		
 		if(inputObject instanceof Address.Command)
 			process((Address.Command) inputObject);
@@ -44,7 +44,7 @@ public interface IComReceiver {
 		return true;	
 	}
 	
-	boolean setProcessingUser(User user);
+	boolean setProcessingUser(User.LoginUser user);
 	
 	default boolean customHandleInput(Object inputObject) {
 		Log.sendMessage(String.format("	Object of Type %s has been recieved!", inputObject.getClass()));

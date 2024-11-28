@@ -13,23 +13,27 @@ import de.ehealth.evek.entity.ServiceProvider;
 import de.ehealth.evek.entity.TransportDetails;
 import de.ehealth.evek.entity.TransportDocument;
 import de.ehealth.evek.entity.User;
+import de.ehealth.evek.network.interfaces.IComServerReceiver;
+import de.ehealth.evek.network.interfaces.IComServerSender;
 import de.ehealth.evek.type.Reference;
 import de.ehealth.evek.util.Debug;
 import de.ehealth.evek.util.Log;
 
-public final class ComReceiver extends Thread implements IComReceiver {
+public final class ComServerReceiver extends Thread implements IComServerReceiver {
 
 	private boolean isRunning = false;
 	
 	private final Socket socket;
+	private final IComServerSender sender;
 	private Reference<User> user;
 //	private BufferedReader reader;
 	private ObjectInputStream objReader;
 	private final ITransportManagementService transportManagementService;
 	
-	public ComReceiver(Socket socket, ITransportManagementService transportManagementService) throws IOException {
+	public ComServerReceiver(Socket socket, ITransportManagementService transportManagementService, IComServerSender sender) throws IOException {
 		this.transportManagementService = transportManagementService;
 		this.socket = socket;
+		this.sender = sender;
 		this.setName(String.format("%s-%s:%d", 
 				getClass().getSimpleName().toString(),
 				socket.getInetAddress().toString().replace("/", ""),
@@ -70,8 +74,8 @@ public final class ComReceiver extends Thread implements IComReceiver {
 					Log.sendMessage("Message could not be read!");
 			}
 		}catch (Exception e) {
-			//Debug.sendException(e);
 			if(e.getMessage() != "Connection reset") {
+				Debug.sendException(e);
 				Log.sendMessage(String.format("	ReceiverThread[%s] has been stopped unexpected!", this.getName()));
 				return;
 			}
@@ -90,51 +94,68 @@ public final class ComReceiver extends Thread implements IComReceiver {
 	}
 
 	@Override
-	public boolean setProcessingUser(User user) {
+	public boolean setProcessingUser(User.LoginUser loginUser) {
+		try {
+			User user = transportManagementService.process(loginUser);
 			this.user = Reference.to(user.id().value().toString());
+			sender.send(user);
+			
 			return true;
+
+		} catch (Exception e) {
+			Log.sendException(e);
+			try {
+				sender.send((User) null);
+			}catch(Exception ex) {
+				Log.sendException(ex);
+
+			}
+		}
+		return false;
+
 	}
 	
 	@Override
 	public void process(Address.Command cmd) throws Exception {
-		transportManagementService.process(cmd);		
+		sender.send(transportManagementService.process(cmd));
+		
 	}
 
 	@Override
 	public void process(Insurance.Command cmd) throws Exception{
-		transportManagementService.process(cmd);				
+		sender.send(transportManagementService.process(cmd));				
 	}
 
 	@Override
 	public void process(InsuranceData.Command cmd) throws Exception {
-		transportManagementService.process(cmd);				
+		sender.send(transportManagementService.process(cmd));				
 		
 	}
 
 	@Override
 	public void process(Patient.Command cmd) throws Exception {
-		transportManagementService.process(cmd);				
+		sender.send(transportManagementService.process(cmd));				
 		
 	}
 
 	@Override
 	public void process(ServiceProvider.Command cmd) throws Exception {
-		transportManagementService.process(cmd);				
+		sender.send(transportManagementService.process(cmd));				
 	}
 
 	@Override
 	public void process(TransportDetails.Command cmd) throws Exception {
-		transportManagementService.process(cmd);				
+		sender.send(transportManagementService.process(cmd));				
 	}
 
 	@Override
 	public void process(TransportDocument.Command cmd) throws Exception {
-		transportManagementService.process(cmd);				
+		sender.send(transportManagementService.process(cmd));				
 	}
 
 	@Override
 	public void process(User.Command cmd) throws Exception {
-		transportManagementService.process(cmd);				
+		sender.send(transportManagementService.process(cmd));				
 	}
 	
 }

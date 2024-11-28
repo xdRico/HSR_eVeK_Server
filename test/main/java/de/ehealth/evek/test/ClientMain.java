@@ -7,7 +7,7 @@ import de.ehealth.evek.entity.Address;
 import de.ehealth.evek.entity.Address.Create;
 import de.ehealth.evek.entity.ServiceProvider;
 import de.ehealth.evek.entity.User;
-import de.ehealth.evek.network.ComSender;
+import de.ehealth.evek.network.ComServerSender;
 
 import de.ehealth.evek.type.UserRole;
 import de.ehealth.evek.util.COptional;
@@ -27,8 +27,9 @@ public class ClientMain {
 			Debug.setDebugMode(true);
 			Log.sendMessage(String.format("Trying to connect to Server at %s:%s", serverAddress, port));
 			Socket server = new Socket(serverAddress, port);
-			ComSender sender = new ComSender(server);
-			
+			ComClientSender sender = new ComClientSender(server);
+			ComClientReceiver receiver = new ComClientReceiver(server);
+
 			
 			Create addressUser = new Address.Create(
 					COptional.empty(), 
@@ -41,10 +42,17 @@ public class ClientMain {
 					"spid-124", "SP", "Transportation", false, true, addressSP, COptional.empty());
 			
 			User.CreateFull user = new User.CreateFull(
-					"LastTest", "PreTest", addressUser, "username", sp, UserRole.superUser);
+					"username", "LastTest", "PreTest", addressUser, sp, UserRole.superUser);
 			
-			sender.sendUser(user);
-			
+			sender.send(user);
+			Log.sendMessage("User: " + user.toString());
+			User receivedUser = receiver.receiveUser();
+			Log.sendMessage("receivedUser: " + receivedUser.toString());
+
+			sender.loginUser(user.userName(), "PW");
+			User loginUser = receiver.receiveUser();
+			Log.sendMessage("loginUser: " + loginUser.toString());
+
 			Thread.sleep(10000);
 			
 			Log.sendMessage("Finished ClientMain!");

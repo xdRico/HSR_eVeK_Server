@@ -12,15 +12,16 @@ import de.ehealth.evek.entity.ServiceProvider;
 import de.ehealth.evek.entity.TransportDetails;
 import de.ehealth.evek.entity.TransportDocument;
 import de.ehealth.evek.entity.User;
+import de.ehealth.evek.network.interfaces.IComServerSender;
 import de.ehealth.evek.type.Reference;
 import de.ehealth.evek.util.Log;
 
-public class ComSender {
+public class ComServerSender implements IComServerSender {
 	
 	Reference<User> user;
 	ObjectOutputStream objSender;
 	
-	public ComSender(Socket client) throws IOException {
+	public ComServerSender(Socket client) throws IOException {
 		try {
 			//this.outputStream =  new PrintWriter(client.getOutputStream(), true);
 			this.objSender = new ObjectOutputStream(client.getOutputStream());
@@ -34,35 +35,44 @@ public class ComSender {
 		objSender.writeObject(pcUser);
 	}
 	
-	public void sendAddress(Address.Command cmd) throws IOException {
+	public void send(Address cmd) throws IOException {
 		objSender.writeObject(cmd); 
 	}
 	
-	public void sendInsurance(Insurance.Command cmd) throws IOException {
+	public void send(Insurance cmd) throws IOException {
 		objSender.writeObject(cmd);
 	}
-	public void sendInsuranceData(InsuranceData.Command cmd) throws IOException {
+	
+	public void send(InsuranceData cmd) throws IOException {
 		objSender.writeObject(cmd);
 	}
-//	public void sendInvoice(Invoice.Command cmd) throws IOException {
-//		objSender.writeObject(cmd);
+	
+//	public void send(Invoice cmd) throws IOException {
+//	objSender.writeObject(cmd);
 //	}
-	public void sendPatient(Patient.Command cmd) throws IOException {
+	
+	public void send(Patient cmd) throws IOException {
 		objSender.writeObject(cmd);
 	}
-//	public void sendProtocol(Protocol.Command cmd) throws IOException {
-//		objSender.writeObject(cmd);
+	
+//	public void send(Protocol cmd) throws IOException {
+//	objSender.writeObject(cmd);
 //	}
-	public void sendServiceProvider(ServiceProvider.Command cmd) throws IOException {
+	
+	public void send(ServiceProvider cmd) throws IOException {
 		objSender.writeObject(cmd);
 	}
-	public void sendTransportDetails(TransportDetails.Command cmd) throws IOException {
+	
+	public void send(TransportDetails cmd) throws IOException {
 		objSender.writeObject(cmd);
 	}
-	public void sendTransportDocument(TransportDocument.Command cmd) throws IOException {
+	
+	public void send(TransportDocument cmd) throws IOException {
 		objSender.writeObject(cmd);
 	}
-	public void sendUser(User.Command cmd) throws IOException {
+	
+	public void send(User cmd) throws IOException {
 		objSender.writeObject(cmd);
 	}
+
 }

@@ -617,11 +617,10 @@ public class TransportManagementService implements ITransportManagementService {
 		
 			case User.Create create -> { 
 				
-				var obj = new User(repo.UserID(), 
+				var obj = new User(repo.UserID(create.userName()), 
 						create.lastName(),
 						create.firstName(),
 						create.address(),
-						create.userName(),
 						create.serviceProvider(),
 						create.role());
 				
@@ -635,11 +634,10 @@ public class TransportManagementService implements ITransportManagementService {
 				Address address = process(create.addressCmd());
 				ServiceProvider sp = process(create.serviceProviderCmd());
 				
-				var obj = new User(repo.UserID(), 
+				var obj = new User(repo.UserID(create.userName()), 
 						create.lastName(),
 						create.firstName(),
 						Reference.to(address.id().value().toString()),
-						create.userName(),
 						Reference.to(sp.id().value().toString()),
 						create.role());
 				
@@ -665,7 +663,6 @@ public class TransportManagementService implements ITransportManagementService {
 						.updateWith(update.lastName(),
 								update.firstName(),
 								update.address(),
-								update.userName(),
 								update.serviceProvider());
 				
 				repo.save(updateObj);
@@ -681,6 +678,11 @@ public class TransportManagementService implements ITransportManagementService {
 				repo.save(updateObj);
 			
 				yield updateObj;
+			}
+			case User.LoginUser login ->{
+				var loginObj  = repo.getUser(login.userName())
+						.orElseThrow(() -> new IllegalArgumentException("Invalid User ID"));
+				yield loginObj;
 			}
 		};
 	}

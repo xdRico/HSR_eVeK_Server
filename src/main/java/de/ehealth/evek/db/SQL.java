@@ -69,7 +69,7 @@ public abstract class SQL {
 	  ){
 	    @Override
 	    public String toString(){
-	      return column + " " + op + " " + value;
+	      return "\"" + column + "\" " + op + " " + value;
 	    }
 	  }
 
@@ -185,7 +185,7 @@ public abstract class SQL {
 	    @Override
 	    public String toString(){
 	      var sql =     
-	        "SELECT " + csv(columns) + " FROM " + table;
+	        "SELECT \"" + csv(columns).replace(",", "\",\"") + "\" FROM \"" + table + "\"";
 
 	      return sql +
 	        Optional.of(criteria)
@@ -253,7 +253,7 @@ public abstract class SQL {
 	    }	  
 
 	    public <T> UpdateBuilder SET(String col, T t){
-	      updates.add(col + " = " + valueOf(t));
+	      updates.add("\"" + col + "\" = " + valueOf(t));
 	      return this;
 	    }  
 
@@ -288,7 +288,7 @@ public abstract class SQL {
 	    @Override
 	    public String toString(){
 
-	      var sql = "UPDATE " + table + " SET " + csv(updates);
+	      var sql = "UPDATE \"" + table + "\" SET " + csv(updates);
 
 	      return sql +
 	        Optional.of(criteria)
@@ -341,7 +341,7 @@ public abstract class SQL {
 	    public String toString(){
 
 	      var sql =     
-	        "DELETE FROM " + table;
+	        "DELETE FROM \"" + table + "\"";
 
 	      return sql +
 	        Optional.of(criteria)
