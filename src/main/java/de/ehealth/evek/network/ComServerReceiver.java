@@ -63,7 +63,6 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 
 	@Override
 	public void run() {
-		// TODO Network Communication, creating db commands
 		isRunning = true;
 		Log.sendMessage(String.format("	ReceiverThread[%s] has been successfully started!", this.getName()));
 		Object readObj;

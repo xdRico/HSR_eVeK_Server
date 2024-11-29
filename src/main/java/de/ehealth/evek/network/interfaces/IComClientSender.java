@@ -13,27 +13,27 @@ import de.ehealth.evek.entity.User;
 
 public interface IComClientSender extends IComSender {
 
-	void send(Address.Command cmd) throws IOException;
+	void sendAddress(Address.Command cmd) throws IOException;
 	
-	void send(Insurance.Command cmd) throws IOException;
+	void sendInsurance(Insurance.Command cmd) throws IOException;
 	
-	void send(InsuranceData.Command cmd) throws IOException;
+	void sendInsuranceData(InsuranceData.Command cmd) throws IOException;
 	
-//	void send(Invoice.Command cmd) throws IOException;
+//	void sendInvoice(Invoice.Command cmd) throws IOException;
 	
-	void send(Patient.Command cmd) throws IOException;
+	void sendPatient(Patient.Command cmd) throws IOException;
 	
-//	void send(Protocol.Command cmd) throws IOException;
+//	void sendProtocol(Protocol.Command cmd) throws IOException;
 	
-	void send(ServiceProvider.Command cmd) throws IOException;
+	void sendServiceProvider(ServiceProvider.Command cmd) throws IOException;
 	
-	void send(TransportDetails.Command cmd) throws IOException;
+	void sendTransportDetails(TransportDetails.Command cmd) throws IOException;
 	
-	void send(TransportDocument.Command cmd) throws IOException;
+	void sendTransportDocument(TransportDocument.Command cmd) throws IOException;
 	
-	void send(User.Command cmd) throws IOException;
+	void sendUser(User.Command cmd) throws IOException;
 
 	default void loginUser(String username, String password) throws IOException {
-		send(new User.LoginUser(username, password));
+		sendUser(new User.LoginUser(username, password));
 	}
 }

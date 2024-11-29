@@ -254,7 +254,6 @@ public class JDBCRepository implements IRepository {
 			
 			InsertBuilder ib = INSERT_INTO("address")
 					.VALUE("addressId", address.id().value().toString())
-					.VALUE("name", address.name().toString())
 					.VALUE("streetName", address.streetName())
 					.VALUE("houseNumber", address.houseNumber())
 					.VALUE("country", address.country())
@@ -438,7 +437,6 @@ public class JDBCRepository implements IRepository {
 		private static String insertSQL(TransportDocument transportDocument) {
 			InsertBuilder ib = INSERT_INTO("transportDocument")
 					.VALUE("transportDocumentId", transportDocument.id().value().toString())
-					.VALUE("insuranceData", transportDocument.insuranceData().id().value().toString())
 					.VALUE("transportReason", transportDocument.transportReason())
 					.VALUE("startDate", transportDocument.startDate())
 					.VALUE("healthcareServiceProvider", transportDocument.healthcareServiceProvider())
@@ -448,7 +446,10 @@ public class JDBCRepository implements IRepository {
 			if(transportDocument.patient() != null 
 					&& transportDocument.patient().isPresent())
 				ib.VALUE("patient", transportDocument.patient().get().id().value().toString());
-			
+			if(transportDocument.insuranceData() != null 
+					&& transportDocument.insuranceData().isPresent())
+				ib.VALUE("insuranceData", transportDocument.insuranceData().get().id().value().toString());
+
 			if(transportDocument.endDate() != null 
 					&& transportDocument.endDate().isPresent()
 					&& transportDocument.weeklyFrequency() != null 
@@ -685,7 +686,6 @@ public class JDBCRepository implements IRepository {
 		private static String updateSQL(TransportDocument transportDocument) {
 			UpdateBuilder ub = UPDATE("transportDocument")
 					.WHERE("transportDocumentId", transportDocument.id().value().toString())
-					.SET("insuranceData", transportDocument.insuranceData().id().value().toString())
 					.SET("transportReason", transportDocument.transportReason())
 					.SET("startDate", transportDocument.startDate())
 					.SET("healthcareServiceProvider", transportDocument.healthcareServiceProvider())
@@ -695,6 +695,10 @@ public class JDBCRepository implements IRepository {
 			if(transportDocument.patient() != null 
 					&& transportDocument.patient().isPresent())
 				ub.SET("patient", transportDocument.patient().get().id().value().toString());
+			
+			if(transportDocument.insuranceData() != null 
+					&& transportDocument.insuranceData().isPresent())
+				ub.SET("insuranceData", transportDocument.insuranceData().get().id().value().toString());
 			
 			if(transportDocument.endDate() != null 
 					&& transportDocument.endDate().isPresent()
@@ -877,7 +881,9 @@ public class JDBCRepository implements IRepository {
 		
 		
 		
-
+		//TODO JDBCRepository - Reading Optionals from DB: new Method COptional.get / COptional.read!
+		//TODO Entities - Command get... for Communication with Client!
+		
 		/**
 		 * static readAddress
 		 * 
@@ -1089,6 +1095,7 @@ public class JDBCRepository implements IRepository {
 		 */
 		private static TransportDocument readTransportDocument(ResultSet rs) throws SQLException {
 			COptional<Reference<Patient>> patient = COptional.empty();
+			COptional<Reference<InsuranceData>> insuranceData = COptional.empty();
 			COptional<Date> endDate = COptional.empty();
 			COptional<Integer> weeklyFrequency = COptional.empty();
 			COptional<String> additionalInfo = COptional.empty();
@@ -1096,6 +1103,10 @@ public class JDBCRepository implements IRepository {
 			if(rs.getString("patient") != null 
 					&& !rs.getString("patient").equalsIgnoreCase("")) {
 				patient = COptional.of(Reference.to(rs.getString("patient")));
+			}
+			if(rs.getString("insuranceData") != null 
+					&& !rs.getString("insuranceData").equalsIgnoreCase("")) {
+				insuranceData = COptional.of(Reference.to(rs.getString("insuranceData")));
 			}
 			if(rs.getDate("endDate") != null
 					&& rs.getInt("weeklyFrequency") > -1) {
@@ -1107,9 +1118,9 @@ public class JDBCRepository implements IRepository {
 				additionalInfo = COptional.of(rs.getString("additionalInfo"));
 			}
 			
-			return new TransportDocument(new Id<>(rs.getString("transportDocumentId")), 
+			return new TransportDocument(new Id<>(rs.getString("transportId")), 
 					patient,
-					Reference.to(rs.getString("insuranceData")),
+					insuranceData,
 					TransportReason.valueOf(rs.getString("transportReason")),
 					rs.getDate("startDate"),
 					endDate,
@@ -1754,7 +1765,7 @@ public class JDBCRepository implements IRepository {
 		@Override
 		public COptional<TransportDocument> getTransportDocument(Id<TransportDocument> id) {
 			try (var stmt = conn.createStatement();
-					var rs = stmt.executeQuery(selectAllSQL("transportDocument", "TransportDocumentId", id.value()))) {
+					var rs = stmt.executeQuery(selectAllSQL("transportDocument", "transportDocumentId", id.value()))) {
 				if(!rs.isClosed())
 					if (rs.next()) 
 						return COptional.of(readTransportDocument(rs));

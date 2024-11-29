@@ -1,4 +1,4 @@
-package de.ehealth.evek.test;
+package de.ehealth.evek.test.network;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -12,6 +12,7 @@ import de.ehealth.evek.entity.ServiceProvider;
 import de.ehealth.evek.entity.TransportDetails;
 import de.ehealth.evek.entity.TransportDocument;
 import de.ehealth.evek.entity.User;
+import de.ehealth.evek.exception.WrongObjectTypeException;
 import de.ehealth.evek.network.interfaces.IComClientReceiver;
 
 public class ComClientReceiver implements IComClientReceiver{

@@ -30,7 +30,7 @@ class ClientConnection {
 		}
 
 	}
-	//TODO
+	
 	@Override
 	public String toString() {
 		return String.format("IP-Adress: %s; Port: %d", 

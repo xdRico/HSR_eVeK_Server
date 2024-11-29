@@ -1,4 +1,4 @@
-package de.ehealth.evek.test;
+package de.ehealth.evek.exception;
 
 import java.io.IOException;
 import java.lang.reflect.Type;

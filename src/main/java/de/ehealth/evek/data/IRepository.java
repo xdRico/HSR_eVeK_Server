@@ -18,6 +18,7 @@ import de.ehealth.evek.entity.ServiceProvider;
 import de.ehealth.evek.entity.TransportDetails;
 import de.ehealth.evek.entity.TransportDocument;
 import de.ehealth.evek.entity.User;
+import de.ehealth.evek.exception.ProviderNotFoundException;
 
 public interface IRepository {
 

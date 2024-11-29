@@ -30,20 +30,10 @@ public record TransportDetails (
 	public static sealed interface Command extends Serializable permits Create, Delete, Update, UpdatePatientSignature, UpdateTransporterSignature{
 	}
 
-	public static record Create( Id<TransportDetails> id, 
+	public static record Create( 
 			Reference<TransportDocument> transportDocument, 
 			Date transportDate, 
-			COptional<Reference<Address>> startAddress,
-			COptional<Reference<Address>> endAddress,
-			COptional<Direction> direction,
-			COptional<PatientCondition> patientCondition,
-			Reference<ServiceProvider> transportProvider,
-			COptional<String> tourNumber,
-			COptional<Boolean> paymentExemption,
-			COptional<String> patientSignature,
-			COptional<Date> patientSignatureDate,
-			COptional<String> transporterSignature,
-			COptional<Date> transporterSignatureDate
+			Reference<ServiceProvider> transportProvider
 			) implements Command {
 	}
 

@@ -1,4 +1,4 @@
-package de.ehealth.evek.data;
+package de.ehealth.evek.exception;
 
 
 public class ProviderNotFoundException extends ClassNotFoundException{

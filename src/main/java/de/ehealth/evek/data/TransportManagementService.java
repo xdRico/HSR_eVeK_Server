@@ -12,6 +12,7 @@ import de.ehealth.evek.entity.TransportDocument;
 import de.ehealth.evek.entity.User;
 import de.ehealth.evek.type.Id;
 import de.ehealth.evek.type.Reference;
+import de.ehealth.evek.util.COptional;
 
 public class TransportManagementService implements ITransportManagementService {
 
@@ -67,6 +68,8 @@ public class TransportManagementService implements ITransportManagementService {
 		};
 	}
 
+	
+	//TODO TransportManagementService - Security: Roles and Rights!
 
 	@Override
 	public List<Address> getAddress(Address.Filter filter) {	
@@ -459,17 +462,17 @@ public class TransportManagementService implements ITransportManagementService {
 				var obj = new TransportDetails(repo.TransportDetailsID(), 
 						create.transportDocument(),
 						create.transportDate(),
-						create.startAddress(),
-						create.endAddress(),
-						create.direction(),
-						create.patientCondition(),
+						COptional.empty(),
+						COptional.empty(),
+						COptional.empty(),
+						COptional.empty(),
 						create.transportProvider(),
-						create.tourNumber(),
-						create.paymentExemption(),
-						create.patientSignature(),
-						create.patientSignatureDate(),
-						create.transporterSignature(),
-						create.transporterSignatureDate());
+						COptional.empty(),
+						COptional.empty(),
+						COptional.empty(),
+						COptional.empty(),
+						COptional.empty(),
+						COptional.empty());
 				
 				repo.save(obj);
 				

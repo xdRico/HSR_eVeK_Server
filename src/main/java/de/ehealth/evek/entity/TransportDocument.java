@@ -13,7 +13,7 @@ import de.ehealth.evek.util.COptional;
 public record TransportDocument(
 		Id<TransportDocument> id,
 		COptional<Reference<Patient>> patient,
-		Reference<InsuranceData> insuranceData,
+		COptional<Reference<InsuranceData>> insuranceData,
 		TransportReason transportReason,
 		Date startDate,
 		COptional<Date> endDate,
@@ -29,7 +29,7 @@ public record TransportDocument(
 	
 	public static record Create(
 			COptional<Reference<Patient>> patient,
-			Reference<InsuranceData> insuranceData,
+			COptional<Reference<InsuranceData>> insuranceData,
 			TransportReason transportReason,
 			Date startDate,
 			COptional<Date> endDate,
@@ -99,7 +99,7 @@ public record TransportDocument(
 			Reference<InsuranceData> newInsuranceData) {
 		return new TransportDocument(
 				this.id, COptional.of(newPatient), 
-				newInsuranceData,
+				COptional.of(newInsuranceData),
 				this.transportReason, this.startDate, 
 				this.endDate, this.weeklyFrequency, 
 				this.healthcareServiceProvider, 
@@ -122,7 +122,7 @@ public record TransportDocument(
 	public String toString() {
 		return String.format(
 				"TransportDocument[id=%s, patient=%s, insuranceData=%s, transportReason=%s, "
-				+ "startDate=%s, endDate=%s, weeklyFrequency=%d, "
+				+ "startDate=%s, endDate=%s, weeklyFrequency=%s, "
 				+ "healthcareServiceProvider=%s, transportationType=%s, "
 				+ "additionalInfo=%s, signature=%s]", 
 				id, patient.toString(), insuranceData.toString(), 

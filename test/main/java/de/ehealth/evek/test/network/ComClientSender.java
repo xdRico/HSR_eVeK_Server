@@ -1,4 +1,4 @@
-package de.ehealth.evek.test;
+package de.ehealth.evek.test.network;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -31,53 +31,49 @@ public class ComClientSender implements IComClientSender {
 		}
 	}
 	
-	public void send(User pcUser) throws IOException {
-		objSender.writeObject(pcUser);
-	}
-	
-	public void send(Address.Command cmd) throws IOException {
+	public void sendAddress(Address.Command cmd) throws IOException {
 		objSender.writeObject(cmd); 
 	}
 	
-	public void send(Insurance.Command cmd) throws IOException {
+	public void sendInsurance(Insurance.Command cmd) throws IOException {
 		objSender.writeObject(cmd);
 	}
 	
-	public void send(InsuranceData.Command cmd) throws IOException {
+	public void sendInsuranceData(InsuranceData.Command cmd) throws IOException {
 		objSender.writeObject(cmd);
 	}
 	
-//	public void send(Invoice.Command cmd) throws IOException {
+//	public void sendInvoice(Invoice.Command cmd) throws IOException {
 //	objSender.writeObject(cmd);
 //	}
 	
-	public void send(Patient.Command cmd) throws IOException {
+	public void sendPatient(Patient.Command cmd) throws IOException {
 		objSender.writeObject(cmd);
 	}
 	
-//	public void send(Protocol.Command cmd) throws IOException {
+//	public void sendProtocol(Protocol.Command cmd) throws IOException {
 //	objSender.writeObject(cmd);
 //	}
 	
-	public void send(ServiceProvider.Command cmd) throws IOException {
+	public void sendServiceProvider(ServiceProvider.Command cmd) throws IOException {
 		objSender.writeObject(cmd);
 	}
 	
-	public void send(TransportDetails.Command cmd) throws IOException {
+	public void sendTransportDetails(TransportDetails.Command cmd) throws IOException {
 		objSender.writeObject(cmd);
 	}
 	
-	public void send(TransportDocument.Command cmd) throws IOException {
+	public void sendTransportDocument(TransportDocument.Command cmd) throws IOException {
 		objSender.writeObject(cmd);
 	}
 	
-	public void send(User.Command cmd) throws IOException {
+	public void sendUser(User.Command cmd) throws IOException {
 		objSender.writeObject(cmd);
+	}
+	
+	public void sendPCUser(User pcUser) throws IOException {
+		objSender.writeObject(pcUser);
 	}
 
-	@Override
-	public void sendPCUser(User pcUser) throws IOException {
-		// TODO Auto-generated method stub
-		
-	}
+	
 }
