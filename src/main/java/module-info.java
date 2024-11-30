@@ -4,6 +4,7 @@ module hsr_evek_server {
 	exports de.ehealth.evek.util;
 	exports de.ehealth.evek.test;
 	exports de.ehealth.evek.network;
+	exports de.ehealth.evek.network.interfaces;
 	exports de.ehealth.evek.entity;
 	exports de.ehealth.evek.core;
 	exports de.ehealth.evek.type;

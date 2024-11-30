@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1.0">
+  <zoom_level>7</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>154</x>
+      <y>448</y>
+      <w>308</w>
+      <h>91</h>
+    </coordinates>
+    <panel_attributes>*Patient*
+--
++ patientId : VARCHAR(10)
++ insuranceData: Reference(UUID) insuranceData(insuranceDataId)
++ lastName : VARCHAR(127)
++ firstName : VARCHAR(63)
++ birthDate : DATE
++ address : Reference(UUID) address(addressId)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>406</x>
+      <y>84</y>
+      <w>147</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>*address*
+--
++ addressId : UUID
++ name : VARCHAR(255)
++ streetName : VARCHAR(255)
++ houseNumber : VARCHAR(10)
++ country : VARCHAR(63)
++ postCode : INTEGER
++ city: VARCHAR(255)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>28</x>
+      <y>70</y>
+      <w>224</w>
+      <h>56</h>
+    </coordinates>
+    <panel_attributes>*insurance*
+--
++ insuranceId : VARCHAR(9)
++ name : VARCHAR(255)
++ address : Reference[UUID] address(addressId)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>0</x>
+      <y>259</y>
+      <w>280</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>*insuranceData*
+--
++ insuranceDataId : UUID
++ patient : VARCHAR(10)
++ insurance : Reference[VARCHAR(9)] insurance(insuranceId)
++ insuranceStatus : INTEGER</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>854</x>
+      <y>84</y>
+      <w>217</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>*serviceProvider*
+--
+serviceProviderId : VARCHAR(9)
+name : VARCHAR(255)
+type : VARCHAR(127)
+isHealthcareProvider : BOOLEAN
+isTransportProvider : BOOLEAN
+address : Reference(UUID) address(addressId)
+contactInfo : VARCHAR(255)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>819</x>
+      <y>238</y>
+      <w>392</w>
+      <h>182</h>
+    </coordinates>
+    <panel_attributes>*transportDetails*
+--
+transportId : UUID
+transportDocument : Reference(UUID) transportDocument(transportDocumentId)
+transportDate : DATE
+startAddress : Reference(UUID) address(addressId)
+endAddress : Reference(UUID) address(addressId)
+direction : VARCHAR(15)
+patientCondition : VARCHAR(15)
+transportServiceProvider : Reference(VARCHAR(9)) serviceProvider(serviceProviderId)
+tourNumber : VARCHAR(255)
+paymentExemption : BOOLEAN
+patientSignature : VARCHAR(255)
+patientSignatureDate : DATE
+transporterSignature : VARCHAR(255)
+transporterSignatureDate : DATE</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>343</x>
+      <y>602</y>
+      <w>399</w>
+      <h>147</h>
+    </coordinates>
+    <panel_attributes>*transportDocument*
+--
+transportDocumentId : UUID
+patient : Reference(VARCHAR(10)) patient(patientId)
+insuranceData : Reference(UUID) insuranceData(insuranceDataId)
+transportReason : VARCHAR(63)
+startDate : DATE
+endDate : DATE
+weeklyFrequency : INTEGER
+healthcareServiceProvider : Reference(VARCHAR(9)) serviceProvider(serviceProviderId)
+transportationType : VARCHAR(15)
+additionalInfo : VARCHAR(255)
+signature : Reference(VARCHAR(63)) user(userId)		</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>294</x>
+      <y>532</y>
+      <w>63</w>
+      <h>119</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;150.0;70.0;150.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>133</x>
+      <y>322</y>
+      <w>224</w>
+      <h>378</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;520.0;300.0;520.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>735</x>
+      <y>147</y>
+      <w>525</w>
+      <h>511</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>480.0;10.0;730.0;10.0;730.0;710.0;10.0;710.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>420</x>
+      <y>343</y>
+      <w>357</w>
+      <h>91</h>
+    </coordinates>
+    <panel_attributes>*user*
+--
++ userId : VARCHAR(63)
++ lastName : VARCHAR(127)
++ firstName : VARCHAR(63)
++ address : Reference(UUID) address(addressId)
++ serviceProvider : Reference(VARCHAR(9)) serviceProvider(serviceProviderId)
++ role : VARCHAR(63)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>567</x>
+      <y>427</y>
+      <w>21</w>
+      <h>189</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;250.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>483</x>
+      <y>182</y>
+      <w>21</w>
+      <h>175</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;230.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>728</x>
+      <y>147</y>
+      <w>140</w>
+      <h>210</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>180.0;10.0;10.0;10.0;10.0;280.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>735</x>
+      <y>413</y>
+      <w>294</w>
+      <h>224</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;300.0;400.0;300.0;400.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>546</x>
+      <y>126</y>
+      <w>287</w>
+      <h>182</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;160.0;10.0;160.0;240.0;390.0;240.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>133</x>
+      <y>119</y>
+      <w>21</w>
+      <h>154</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;200.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>301</x>
+      <y>147</y>
+      <w>119</w>
+      <h>315</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>150.0;10.0;10.0;10.0;10.0;430.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1001</x>
+      <y>182</y>
+      <w>21</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>546</x>
+      <y>105</y>
+      <w>322</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;440.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>245</x>
+      <y>98</y>
+      <w>175</w>
+      <h>21</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>230.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>

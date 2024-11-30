@@ -27,7 +27,7 @@ public record TransportDetails (
 		COptional<Date> transporterSignatureDate
 		) implements Serializable {
 
-	public static sealed interface Command extends Serializable permits Create, Delete, Update, UpdatePatientSignature, UpdateTransporterSignature{
+	public static sealed interface Command extends Serializable permits Create, Delete, Update, UpdatePatientSignature, UpdateTransporterSignature, Get, GetList{
 	}
 
 	public static record Create( 
@@ -59,6 +59,11 @@ public record TransportDetails (
 			Date transporterSignatureDate) implements Command {
 	}
 	
+	public static record Get(Id<TransportDetails> id) implements Command {
+	}
+	public static record GetList(Filter filter) implements Command {
+	}
+	
 	public static record Filter(
 			COptional<Reference<TransportDocument>> transportDocument,
 			COptional<Date> transportDate, 
@@ -68,7 +73,7 @@ public record TransportDetails (
 	}
 
 	public static interface Operations {
-		TransportDetails process(Command cmd) throws Exception;
+		TransportDetails process(Command cmd, Reference<User> processingUser) throws Throwable;
 
 		List<TransportDetails> getTransportDetails(Filter filter);
 

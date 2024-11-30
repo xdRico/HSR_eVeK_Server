@@ -71,8 +71,8 @@ public class ComClientSender implements IComClientSender {
 		objSender.writeObject(cmd);
 	}
 	
-	public void sendPCUser(User pcUser) throws IOException {
-		objSender.writeObject(pcUser);
+	public void sendPCUser(User.LoginUser loginUser) throws IOException {
+		objSender.writeObject(loginUser);
 	}
 
 	

@@ -1,6 +1,7 @@
 package de.ehealth.evek.network.interfaces;
 
 import java.io.IOException;
+import java.util.List;
 
 import de.ehealth.evek.entity.Address;
 import de.ehealth.evek.entity.Insurance;
@@ -33,5 +34,9 @@ public interface IComServerSender extends IComSender {
 	void send(TransportDocument cmd) throws IOException;
 
 	void send(User cmd) throws IOException;
+
+	void send(Throwable e) throws IOException;
+	
+	void send(List<?> list) throws IOException;
 
 }

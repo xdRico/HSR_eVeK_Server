@@ -223,6 +223,8 @@ public interface IRepository {
 	
 	
 	
+	
+	
 	/**
 	 * delete
 	 * 
@@ -540,6 +542,16 @@ public interface IRepository {
 	 * @return User - the User with the given ID
 	 */
 	COptional<User> getUser(String id);
+	
+	/**
+	 * getUser
+	 * 
+	 * Method to get an User by its ID
+	 * 
+	 * @param login - the User.LoginUser Command used for login
+	 * @return Boolean - the Boolean representing if the Credentials are right
+	 */
+	Boolean loginCredentials(User.LoginUser login);
 	
 	
 	

@@ -14,7 +14,7 @@ public record Insurance(
 		Reference<Address> address
 		) implements Serializable {
 	
-	public static sealed interface Command extends Serializable permits Create, Delete, Move, Update {
+	public static sealed interface Command extends Serializable permits Create, Delete, Move, Update, Get, GetList {
 	}
 
 	public static record Create(String insuranceId, String name, Reference<Address> address) implements Command {
@@ -26,16 +26,20 @@ public record Insurance(
 			Reference<Address> address) implements Command {
 	}
 
-	public static record Update(Id<Insurance> id,
-			String name) implements Command {
+	public static record Update(Id<Insurance> id, String name) implements Command {
 	}
-
+	
+	public static record Get(Id<Insurance> id) implements Command {
+	}
+	public static record GetList(Filter filter) implements Command {
+	}
+	
 	public static record Filter(COptional<Reference<Address>> address, 
 			COptional<String> name) {
 	}
 
 	public static interface Operations {
-		Insurance process(Command cmd) throws Exception;
+		Insurance process(Command cmd, Reference<User> processingUser) throws Throwable;
 
 		List<Insurance> getInsurance(Filter filter);
 

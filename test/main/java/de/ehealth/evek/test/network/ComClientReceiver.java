@@ -2,7 +2,9 @@ package de.ehealth.evek.test.network;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.lang.reflect.Type;
 import java.net.Socket;
+import java.util.List;
 
 import de.ehealth.evek.entity.Address;
 import de.ehealth.evek.entity.Insurance;
@@ -17,11 +19,9 @@ import de.ehealth.evek.network.interfaces.IComClientReceiver;
 
 public class ComClientReceiver implements IComClientReceiver{
 
-	private final Socket server;
 	private final ObjectInputStream objReader;
 	
 	public ComClientReceiver(Socket server) throws IOException {
-		this.server = server;
 		objReader = new ObjectInputStream(server.getInputStream());
 	}
 	
@@ -29,21 +29,21 @@ public class ComClientReceiver implements IComClientReceiver{
 		Object object = objReader.readObject();
 		if(object instanceof Address) 
 			return (Address) object;
-		else throw new WrongObjectTypeException(Address.class, object);
+		throw wrongObjectType(Address.class, object);
 	}
 	
 	public Insurance receiveInsurance() throws Exception {
 		Object object = objReader.readObject();
 		if(object instanceof Insurance) 
 			return (Insurance) object;
-		else throw new WrongObjectTypeException(Insurance.class, object);
+		throw wrongObjectType(Insurance.class, object);
 	}
 	
 	public InsuranceData receiveInsuranceData() throws Exception {
 		Object object = objReader.readObject();
 		if(object instanceof InsuranceData) 
 			return (InsuranceData) object;
-		else throw new WrongObjectTypeException(InsuranceData.class, object);
+		throw wrongObjectType(InsuranceData.class, object);
 	}
 	
 //	public Invoice receiveInvoice() throws Exception {
@@ -57,7 +57,7 @@ public class ComClientReceiver implements IComClientReceiver{
 		Object object = objReader.readObject();
 		if(object instanceof Patient) 
 			return (Patient) object;
-		else throw new WrongObjectTypeException(Patient.class, object);
+		throw wrongObjectType(Patient.class, object);
 	}
 	
 //	public Protocol receiveProtocol() throws Exception {
@@ -71,27 +71,49 @@ public class ComClientReceiver implements IComClientReceiver{
 		Object object = objReader.readObject();
 		if(object instanceof ServiceProvider) 
 			return (ServiceProvider) object;
-		else throw new WrongObjectTypeException(ServiceProvider.class, object);
+		throw wrongObjectType(ServiceProvider.class, object);
 	}
 	
 	public TransportDetails receiveTransportDetails() throws Exception {
 		Object object = objReader.readObject();
 		if(object instanceof TransportDetails) 
 			return (TransportDetails) object;
-		else throw new WrongObjectTypeException(TransportDetails.class, object);
+		throw wrongObjectType(TransportDetails.class, object);
 	}
 	
 	public TransportDocument receiveTransportDocument() throws Exception {
 		Object object = objReader.readObject();
 		if(object instanceof TransportDocument) 
 			return (TransportDocument) object;
-		else throw new WrongObjectTypeException(TransportDocument.class, object);
+		throw wrongObjectType(TransportDocument.class, object);
 	}
 	
 	public User receiveUser() throws Exception {
 		Object object = objReader.readObject();
 		if(object instanceof User) 
 			return (User) object;
-		else throw new WrongObjectTypeException(User.class, object);
+		throw wrongObjectType(User.class, object);
+	}
+
+	@Override
+	public Throwable receiveException() throws Exception {
+		Object object = objReader.readObject();
+		if(object instanceof Throwable) 
+			return (Throwable) object;
+		throw wrongObjectType(Throwable.class, object);
+	}
+
+	@Override
+	public List<?> receiveList() throws Exception {
+		Object object = objReader.readObject();
+		if(object instanceof List<?>) 
+			return (List<?>) object;
+		throw wrongObjectType(List.class, object);
+	}
+	
+	private static Exception wrongObjectType(Type expected, Object received) {
+		if(received instanceof Exception)
+			return (Exception) received;
+		return new WrongObjectTypeException(expected, received);
 	}
 }

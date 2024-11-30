@@ -17,12 +17,13 @@ public record User(
 		UserRole role
 		) implements Serializable {
 
-	public static sealed interface Command extends Serializable permits Create, CreateFull, Update, Delete, UpdateRole, LoginUser {		
+	public static sealed interface Command extends Serializable permits Create, CreateFull, Update, Delete, UpdateRole, UpdateCredentials, LoginUser, Get, GetList {		
 	}
 	
 	
 	public static record Create(
 			String userName,
+			String password,
 			String lastName,
 			String firstName,
 			Reference<Address> address,
@@ -32,6 +33,7 @@ public record User(
 	
 	public static record CreateFull(
 			String userName,
+			String password,
 			String lastName,
 			String firstName,
 			Address.Create addressCmd,
@@ -48,12 +50,28 @@ public record User(
 			String firstName,
 			Reference<Address> address,
 			Reference<ServiceProvider> serviceProvider
-			) implements Command{
+			) implements Command {
 	}
 	
-	public static record UpdateRole(Id<User> id, UserRole role) implements Command{	
+	public static record UpdateRole(
+			Id<User> id, 
+			UserRole role) implements Command {	
 	}
-	public static record LoginUser(String userName, String password) implements Command{	
+	public static record UpdateCredentials(
+			Id<User> oldUserName, 
+			String newUserName, 
+			String oldPassword, 
+			String newPassword) implements Command {
+	}
+	
+	public static record LoginUser(
+			String userName, 
+			String password) implements Command {	
+	}
+	
+	public static record Get(Id<User> id) implements Command {
+	}
+	public static record GetList(Filter filter) implements Command {
 	}
 	
 	public static record Filter(COptional<String> lastName, COptional<String> firstName, 
@@ -62,7 +80,7 @@ public record User(
 	}
 
 	public static interface Operations {
-		User process(Command cmd) throws Exception;
+		User process(Command cmd, Reference<User> processingUser) throws Throwable;
 
 		List<User> getUser(Filter filter);
 
@@ -85,6 +103,12 @@ public record User(
 				this.serviceProvider, newRole);
 	}
 	
+	public User updateCredentials(Id<User> oldUserName, Id<User> newUserName) {
+		if(oldUserName != this.id)
+			throw new IllegalArgumentException();
+		return new User(newUserName, this.lastName, this.firstName, this.address, 
+				this.serviceProvider, this.role);
+	}
 	
 	public String toString() {
 		return String.format(

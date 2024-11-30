@@ -3,6 +3,7 @@ package de.ehealth.evek.entity;
 import java.io.Serializable;
 import java.sql.Date;
 import java.util.List;
+
 import de.ehealth.evek.type.Id;
 import de.ehealth.evek.type.Reference;
 import de.ehealth.evek.util.COptional;
@@ -16,7 +17,7 @@ public record Patient (
 		Reference<Address> address
 		) implements Serializable {
 
-	public static sealed interface Command extends Serializable permits Create, Delete, Move, Update{
+	public static sealed interface Command extends Serializable permits Create, Delete, Move, Update, Get, GetList{
 	}
 
 	public static record Create(String insuranceNumber, 
@@ -36,6 +37,11 @@ public record Patient (
 			String firstName, Reference<Address> address) implements Command {
 	}
 
+	public static record Get(Id<Patient> id) implements Command {
+	}
+	public static record GetList(Filter filter) implements Command {
+	}
+	
 	public static record Filter(COptional<Reference<Address>> address, 
 			COptional<String> lastName, COptional<String> firstName, 
 			COptional<Date> birthDate, 
@@ -43,7 +49,7 @@ public record Patient (
 	}
 
 	public static interface Operations {
-		Patient process(Command cmd) throws Exception;
+		Patient process(Command cmd, Reference<User> processingUser) throws Throwable;
 
 		List<Patient> getPatient(Filter filter);
 

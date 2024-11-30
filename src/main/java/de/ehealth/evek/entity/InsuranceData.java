@@ -14,7 +14,7 @@ public record InsuranceData(
 		int insuranceStatus
 		) implements Serializable {
 	
-	public static sealed interface Command extends Serializable permits Create, Delete{
+	public static sealed interface Command extends Serializable permits Create, Delete, Get, GetList{
 	}
 	
 	public static record Create(
@@ -25,6 +25,11 @@ public record InsuranceData(
 	
 	public static record Delete(Id<InsuranceData> id) implements Command {
 	}
+	
+	public static record Get(Id<InsuranceData> id) implements Command {
+	}
+	public static record GetList(Filter filter) implements Command {
+	}
 
 	public static record Filter(
 			COptional<Reference<Patient>> patient,
@@ -32,7 +37,7 @@ public record InsuranceData(
 	}
 
 	public static interface Operations {
-		InsuranceData process(Command cmd) throws Exception;
+		InsuranceData process(Command cmd, Reference<User> processingUser) throws Throwable;
 
 		List<InsuranceData> getInsuranceData(Filter filter);
 

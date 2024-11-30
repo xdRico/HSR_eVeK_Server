@@ -8,16 +8,20 @@ import de.ehealth.evek.entity.ServiceProvider;
 import de.ehealth.evek.entity.TransportDetails;
 import de.ehealth.evek.entity.TransportDocument;
 import de.ehealth.evek.entity.User;
+import de.ehealth.evek.exception.UserNotProvidedException;
 import de.ehealth.evek.util.Log;
 
 public interface IComServerReceiver {
 
-	default boolean receiveObject(Object inputObject) throws Exception {
+	default boolean receiveObject(Object inputObject) throws Throwable {
 		if(customHandleInput(inputObject))
 			return true;
 		
 		if(inputObject instanceof User.LoginUser) 
 			return setProcessingUser((User.LoginUser) inputObject);
+		
+		if(!hasProcessingUser())
+			throw new UserNotProvidedException();
 		
 		if(inputObject instanceof Address.Command)
 			process((Address.Command) inputObject);
@@ -46,21 +50,23 @@ public interface IComServerReceiver {
 	
 	boolean setProcessingUser(User.LoginUser user);
 	
+	boolean hasProcessingUser();
+	
 	default boolean customHandleInput(Object inputObject) {
 		Log.sendMessage(String.format("	Object of Type %s has been recieved!", inputObject.getClass()));
 		return false;
 	}
 	
-	void process(Address.Command cmd) throws Exception;
-	void process(Insurance.Command cmd) throws Exception;
-	void process(InsuranceData.Command cmd) throws Exception;
-//	void process(Invoice.Command cmd) throws Exception;
-	void process(Patient.Command cmd) throws Exception;
-//	void process(Protocol.Command cmd) throws Exception;
-	void process(ServiceProvider.Command cmd) throws Exception;
-	void process(TransportDetails.Command cmd) throws Exception;
-	void process(TransportDocument.Command cmd) throws Exception;
-	void process(User.Command cmd) throws Exception;
+	void process(Address.Command cmd) throws Throwable;
+	void process(Insurance.Command cmd) throws Throwable;
+	void process(InsuranceData.Command cmd) throws Throwable;
+//	void process(Invoice.Command cmd) throws Throwable;
+	void process(Patient.Command cmd) throws Throwable;
+//	void process(Protocol.Command cmd) throws Throwable;
+	void process(ServiceProvider.Command cmd) throws Throwable;
+	void process(TransportDetails.Command cmd) throws Throwable;
+	void process(TransportDocument.Command cmd) throws Throwable;
+	void process(User.Command cmd) throws Throwable;
 
 	
 }

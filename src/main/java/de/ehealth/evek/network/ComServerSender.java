@@ -3,6 +3,7 @@ package de.ehealth.evek.network;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.List;
 
 import de.ehealth.evek.entity.Address;
 import de.ehealth.evek.entity.Insurance;
@@ -31,8 +32,8 @@ public class ComServerSender implements IComServerSender {
 		}
 	}
 	
-	public void sendPCUser(User pcUser) throws IOException {
-		objSender.writeObject(pcUser);
+	public void sendPCUser(User.LoginUser loginUser) throws IOException {
+		objSender.writeObject(loginUser);
 	}
 	
 	public void send(Address cmd) throws IOException {
@@ -75,4 +76,11 @@ public class ComServerSender implements IComServerSender {
 		objSender.writeObject(cmd);
 	}
 
+	public void send(Throwable e) throws IOException {
+		objSender.writeObject(e);
+	}
+	
+	public void send(List<?> list) throws IOException {
+		objSender.writeObject(list);
+	}
 }

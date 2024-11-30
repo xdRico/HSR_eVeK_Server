@@ -1,5 +1,7 @@
 package de.ehealth.evek.network.interfaces;
 
+import java.util.List;
+
 import de.ehealth.evek.entity.Address;
 import de.ehealth.evek.entity.Insurance;
 import de.ehealth.evek.entity.InsuranceData;
@@ -10,7 +12,6 @@ import de.ehealth.evek.entity.TransportDocument;
 import de.ehealth.evek.entity.User;
 
 public interface IComClientReceiver {
-
 	
 	public Address receiveAddress() throws Exception;
 	
@@ -31,5 +32,9 @@ public interface IComClientReceiver {
 	public TransportDocument receiveTransportDocument() throws Exception;
 	
 	public User receiveUser() throws Exception;
+	
+	public Throwable receiveException() throws Exception;
+	
+	public List<?> receiveList() throws Exception;
 	
 }

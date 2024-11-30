@@ -25,6 +25,8 @@ import de.ehealth.evek.entity.ServiceProvider;
 import de.ehealth.evek.entity.TransportDetails;
 import de.ehealth.evek.entity.TransportDocument;
 import de.ehealth.evek.entity.User;
+import de.ehealth.evek.entity.User.LoginUser;
+import de.ehealth.evek.exception.IsArchivedException;
 import de.ehealth.evek.type.Direction;
 import de.ehealth.evek.type.Id;
 import de.ehealth.evek.type.PatientCondition;
@@ -194,7 +196,8 @@ public class JDBCRepository implements IRepository {
 					"healthcareServiceProvider" VARCHAR(9) NOT NULL REFERENCES "serviceProvider"("serviceProviderId"),
 					"transportationType" VARCHAR(15) NOT NULL,
 					"additionalInfo" VARCHAR(255),
-					"signature" VARCHAR(63) NOT NULL REFERENCES "user"("userId")
+					"signature" VARCHAR(63) NOT NULL REFERENCES "user"("userId"),
+					"archived" BOOLEAN NOT NULL
 				);
 				""";
 
@@ -208,7 +211,12 @@ public class JDBCRepository implements IRepository {
 					"role" VARCHAR(63)
 				);
 				""";
-		
+		private static final String CREATE_TABLE_CREDENTIALS = """
+				CREATE TABLE IF NOT EXISTS "login" (
+				"user" VARCHAR(63) NOT NULL REFERENCES "user"("userId"),
+				"password" VARCHAR(127) NOT NULL
+			);
+			""";
 		
 		
 		
@@ -229,6 +237,7 @@ public class JDBCRepository implements IRepository {
 //				stmt.execute(CREATE_TABLE_PROTOCOL);
 				stmt.execute(CREATE_TABLE_SERVICEPROVIDER);
 				stmt.execute(CREATE_TABLE_USER);
+				stmt.execute(CREATE_TABLE_CREDENTIALS);
 				stmt.execute(CREATE_TABLE_TRANSPORTDOCUMENT);
 				stmt.execute(CREATE_TABLE_TRANSPORTDETAILS);
 
@@ -441,7 +450,8 @@ public class JDBCRepository implements IRepository {
 					.VALUE("startDate", transportDocument.startDate())
 					.VALUE("healthcareServiceProvider", transportDocument.healthcareServiceProvider())
 					.VALUE("transportationType", transportDocument.transportationType())
-					.VALUE("signature", transportDocument.signature().id().value().toString());
+					.VALUE("signature", transportDocument.signature().id().value().toString())
+					.VALUE("archived", transportDocument.isArchived());
 			
 			if(transportDocument.patient() != null 
 					&& transportDocument.patient().isPresent())
@@ -481,6 +491,21 @@ public class JDBCRepository implements IRepository {
 					 .VALUE("address", user.address().id().value().toString())
 					 .VALUE("serviceProvider", user.serviceProvider().id().value().toString())
 					 .VALUE("role", user.role())
+					 .toString();
+		}
+		
+		/**
+		 * static insertSQL
+		 * 
+		 * Method returning the SQL Command for inserting User login data to the database 
+		 * 
+		 * @param LoginUser - the User data to be added
+		 * @return String - the SQL Command as String
+		 */
+		private static String insertSQL(LoginUser login) {
+			 return INSERT_INTO("login")
+					 .VALUE("user", login.userName())
+					 .VALUE("password", login.password())
 					 .toString();
 		}
 		
@@ -690,7 +715,8 @@ public class JDBCRepository implements IRepository {
 					.SET("startDate", transportDocument.startDate())
 					.SET("healthcareServiceProvider", transportDocument.healthcareServiceProvider())
 					.SET("transportationType", transportDocument.transportationType())
-					.SET("signature", transportDocument.signature().id().value().toString());
+					.SET("signature", transportDocument.signature().id().value().toString())
+					.SET("archived", transportDocument.isArchived());
 			
 			if(transportDocument.patient() != null 
 					&& transportDocument.patient().isPresent())
@@ -731,6 +757,22 @@ public class JDBCRepository implements IRepository {
 					 .SET("address", user.address().id().value().toString())
 					 .SET("serviceProvider", user.serviceProvider().id().value().toString())
 					 .SET("role", user.role())
+					 .toString();
+		}
+		
+		/**
+		 * static insertSQL
+		 * 
+		 * Method returning the SQL Command for inserting User login data to the database 
+		 * 
+		 * @param LoginUser - the User data to be added
+		 * @return String - the SQL Command as String
+		 */
+		private static String updateSQL(LoginUser login) {
+			 return UPDATE("login")
+					 .WHERE("user", login.userName())
+					 .SET("user", login.userName())
+					 .SET("password", login.password())
 					 .toString();
 		}
 		
@@ -1128,7 +1170,8 @@ public class JDBCRepository implements IRepository {
 					Reference.to(rs.getString("healthcareServiceProvider")),
 					TransportationType.valueOf(rs.getString("transportationType")),
 					additionalInfo,
-					Reference.to(rs.getString("signature")));
+					Reference.to(rs.getString("signature")),
+					rs.getBoolean("archived"));
 		}
 		
 		/**
@@ -1297,8 +1340,11 @@ public class JDBCRepository implements IRepository {
 		@Override
 		public void save(TransportDocument transportDocument) throws Exception {
 			try (var stmt = conn.createStatement()) {
-				var sql = getTransportDocument(transportDocument.id()).isPresent() 
-						? updateSQL(transportDocument) : insertSQL(transportDocument);
+				COptional<TransportDocument> transportDoc = getTransportDocument(transportDocument.id());
+				boolean isPresent = transportDoc.isPresent();
+				if(isPresent && transportDoc.get().isArchived())
+					throw new IsArchivedException(transportDoc.get().id());
+				var sql = isPresent	? updateSQL(transportDocument) : insertSQL(transportDocument);
 				stmt.executeUpdate(sql);
 			} catch (SQLException e) {
 				throw new RuntimeException(e);
@@ -1800,4 +1846,28 @@ public class JDBCRepository implements IRepository {
 			}
 			return COptional.empty();
 		}
+
+		private String getPassword(Id<User> id) throws Exception {
+			try (var stmt = conn.createStatement();
+					var rs = stmt.executeQuery(selectAllSQL("login", "user", id.value()))) {
+				if(!rs.isClosed())
+					if (rs.next()) 
+						return rs.getString("password");
+				throw new RuntimeException();
+			}catch(SQLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
+		@Override
+		public Boolean loginCredentials(LoginUser login) {
+			try {
+				User user = getUser(login.userName()).get();
+				return login.password() == getPassword(user.id());
+				
+			}catch(Exception e) {
+				return false;
+			}
+		}
+		
 }

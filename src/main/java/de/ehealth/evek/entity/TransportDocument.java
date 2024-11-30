@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.sql.Date;
 import java.util.List;
 
+import de.ehealth.evek.exception.IsNotArchivableException;
 import de.ehealth.evek.type.Id;
 import de.ehealth.evek.type.Reference;
 import de.ehealth.evek.type.TransportReason;
@@ -21,10 +22,11 @@ public record TransportDocument(
 		Reference<ServiceProvider> healthcareServiceProvider,
 		TransportationType transportationType,
 		COptional<String> additionalInfo,
-		Reference<User> signature
+		Reference<User> signature,
+		boolean isArchived
 		) implements Serializable{
 	
-	public static sealed interface Command extends Serializable permits Create, Update, AssignPatient, Delete{
+	public static sealed interface Command extends Serializable permits Create, Update, AssignPatient, Archive, Delete, Get, GetList{
 	}
 	
 	public static record Create(
@@ -61,6 +63,14 @@ public record TransportDocument(
 			Reference<InsuranceData> insuranceData) implements Command {
 	}
 
+	public static record Archive(Id<TransportDocument> id) implements Command {
+	}
+	
+	public static record Get(Id<TransportDocument> id) implements Command {
+	}
+	public static record GetList(Filter filter) implements Command {
+	}
+	
 	public static record Filter(COptional<Reference<Patient>> patient,
 			COptional<InsuranceData> insuranceData,
 			COptional<Date> startDate, COptional<Date> endDate,
@@ -68,9 +78,9 @@ public record TransportDocument(
 			COptional<TransportationType> transportationType,
 			COptional<Reference<User>> signature) {
 	}
-
+	
 	public static interface Operations {
-		TransportDocument process(Command cmd) throws Exception;
+		TransportDocument process(Command cmd, Reference<User> processingUser) throws Throwable;
 
 		List<TransportDocument> getTransportDocument(Filter filter);
 
@@ -91,7 +101,7 @@ public record TransportDocument(
 				this.id, this.patient, insuranceData, newTransportReason, 
 				newStartDate, newEndDate, newWeeklyFrequency, 
 				newServiceProvider, newTransportationType, 
-				newAdditionalInfo, newSignature);
+				newAdditionalInfo, newSignature, this.isArchived);
 	}
 	
 	public TransportDocument assignPatient(
@@ -104,7 +114,7 @@ public record TransportDocument(
 				this.endDate, this.weeklyFrequency, 
 				this.healthcareServiceProvider, 
 				this.transportationType, 
-				this.additionalInfo, this.signature);
+				this.additionalInfo, this.signature, this.isArchived);
 	}
 	
 	public TransportDocument assignSignature(Reference<User> newSignature) {
@@ -115,7 +125,25 @@ public record TransportDocument(
 				this.endDate, this.weeklyFrequency, 
 				this.healthcareServiceProvider, 
 				this.transportationType, 
-				this.additionalInfo, newSignature);
+				this.additionalInfo, newSignature, this.isArchived);
+	}
+	
+	public TransportDocument archive() throws IsNotArchivableException {
+		if(this.patient == null || this.patient.isEmpty() 
+				|| this.insuranceData == null || this.insuranceData.isEmpty() 
+				|| this.transportReason == null || this.startDate == null 
+				|| this.transportationType == null || this.signature == null)
+			throw new IsNotArchivableException("Missing information!", this.id);
+		if(this.isArchived)
+			throw new IsNotArchivableException("Already archived!", this.id);
+		return new TransportDocument(
+				this.id, this.patient,
+				this.insuranceData,
+				this.transportReason, this.startDate, 
+				this.endDate, this.weeklyFrequency, 
+				this.healthcareServiceProvider, 
+				this.transportationType, 
+				this.additionalInfo, this.signature, true);
 	}
 	
 	
@@ -124,11 +152,11 @@ public record TransportDocument(
 				"TransportDocument[id=%s, patient=%s, insuranceData=%s, transportReason=%s, "
 				+ "startDate=%s, endDate=%s, weeklyFrequency=%s, "
 				+ "healthcareServiceProvider=%s, transportationType=%s, "
-				+ "additionalInfo=%s, signature=%s]", 
+				+ "additionalInfo=%s, signature=%s, isArchived=%b]", 
 				id, patient.toString(), insuranceData.toString(), 
 				transportReason.toString(), startDate.toString(), endDate.toString(),
 				weeklyFrequency, healthcareServiceProvider.toString(), 
 				transportationType.toString(), additionalInfo.toString(), 
-				signature.toString());
+				signature.toString(), this.isArchived);
 	}
 }

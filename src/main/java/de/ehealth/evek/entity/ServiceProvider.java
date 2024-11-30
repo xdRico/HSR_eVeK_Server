@@ -17,7 +17,7 @@ public record ServiceProvider(
 		COptional<String> contactInfo
 		) implements Serializable {
 
-	public static sealed interface Command extends Serializable permits Create, CreateFull, Delete, Move, Update, UpdateService {
+	public static sealed interface Command extends Serializable permits Create, CreateFull, Delete, Move, Update, UpdateService, Get, GetList {
 	}
 
 	public static record Create(String serviceProviderId, String name, String  type, 
@@ -42,13 +42,18 @@ public record ServiceProvider(
 	public static record UpdateService(Id<ServiceProvider> id, Boolean providesHealthcare, 
 			Boolean providesTransport) implements Command{
 	}
+	
+	public static record Get(Id<ServiceProvider> id) implements Command {
+	}
+	public static record GetList(Filter filter) implements Command {
+	}
 
 	public static record Filter(COptional<Reference<Address>> address, 
 			COptional<String> type, COptional<String> name) {
 	}
 
 	public static interface Operations {
-		ServiceProvider process(Command cmd) throws Exception;
+		ServiceProvider process(Command cmd, Reference<User> processingUser) throws Throwable;
 
 		List<ServiceProvider> getServiceProvider(Filter filter);
 

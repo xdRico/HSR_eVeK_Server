@@ -13,6 +13,7 @@ import de.ehealth.evek.entity.ServiceProvider;
 import de.ehealth.evek.entity.TransportDetails;
 import de.ehealth.evek.entity.TransportDocument;
 import de.ehealth.evek.entity.User;
+import de.ehealth.evek.exception.GetListThrowable;
 import de.ehealth.evek.network.interfaces.IComServerReceiver;
 import de.ehealth.evek.network.interfaces.IComServerSender;
 import de.ehealth.evek.type.Reference;
@@ -26,7 +27,6 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 	private final Socket socket;
 	private final IComServerSender sender;
 	private Reference<User> user;
-//	private BufferedReader reader;
 	private ObjectInputStream objReader;
 	private final ITransportManagementService transportManagementService;
 	
@@ -39,7 +39,6 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 				socket.getInetAddress().toString().replace("/", ""),
 				socket.getPort()));
 		try {
-//			this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			this.objReader = new ObjectInputStream(socket.getInputStream());
 			this.start();
 
@@ -72,7 +71,7 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 				if(!receiveObject(readObj))
 					Log.sendMessage("Message could not be read!");
 			}
-		}catch (Exception e) {
+		}catch (Throwable e) {
 			if(e.getMessage() != "Connection reset") {
 				Debug.sendException(e);
 				Log.sendMessage(String.format("	ReceiverThread[%s] has been stopped unexpected!", this.getName()));
@@ -91,17 +90,17 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 				socket.getPort(),
 				this.getName());
 	}
-
+	
 	@Override
 	public boolean setProcessingUser(User.LoginUser loginUser) {
 		try {
-			User user = transportManagementService.process(loginUser);
+			User user = transportManagementService.process(loginUser, null);
 			this.user = Reference.to(user.id().value().toString());
 			sender.send(user);
 			
 			return true;
 
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			Log.sendException(e);
 			try {
 				sender.send((User) null);
@@ -111,50 +110,113 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 			}
 		}
 		return false;
-
+	}
+	
+	public boolean hasProcessingUser() {
+		return user != null;
 	}
 	
 	@Override
-	public void process(Address.Command cmd) throws Exception {
-		sender.send(transportManagementService.process(cmd));
-		
+	public void process(Address.Command cmd) throws Throwable {
+		try{
+			sender.send(transportManagementService.process(cmd, user));
+		}catch(GetListThrowable t) {
+			sender.send(t.getList());
+		}catch(Exception e) {
+			if(!(e instanceof IllegalArgumentException))
+				sender.send(e);
+			throw e;
+		}
 	}
 
 	@Override
-	public void process(Insurance.Command cmd) throws Exception{
-		sender.send(transportManagementService.process(cmd));				
+	public void process(Insurance.Command cmd) throws Throwable{
+		try{
+			sender.send(transportManagementService.process(cmd, user));
+		}catch(GetListThrowable t) {
+			sender.send(t.getList());
+		}catch(Exception e) {
+			if(!(e instanceof IllegalArgumentException))
+				sender.send(e);
+			throw e;
+		}	
 	}
 
 	@Override
-	public void process(InsuranceData.Command cmd) throws Exception {
-		sender.send(transportManagementService.process(cmd));				
-		
+	public void process(InsuranceData.Command cmd) throws Throwable {
+		try {
+			sender.send(transportManagementService.process(cmd, user));
+		}catch(GetListThrowable t) {
+			sender.send(t.getList());
+		}catch(Exception e) {
+			if(!(e instanceof IllegalArgumentException))
+				sender.send(e);
+			throw e;
+		}
 	}
 
 	@Override
-	public void process(Patient.Command cmd) throws Exception {
-		sender.send(transportManagementService.process(cmd));				
-		
+	public void process(Patient.Command cmd) throws Throwable {
+		try{
+			sender.send(transportManagementService.process(cmd, user));
+		}catch(GetListThrowable t) {
+			sender.send(t.getList());
+		}catch(Exception e) {
+			if(!(e instanceof IllegalArgumentException))
+				sender.send(e);
+			throw e;
+		}
 	}
 
 	@Override
-	public void process(ServiceProvider.Command cmd) throws Exception {
-		sender.send(transportManagementService.process(cmd));				
+	public void process(ServiceProvider.Command cmd) throws Throwable {
+		try {
+			sender.send(transportManagementService.process(cmd, user));
+		}catch(GetListThrowable t) {
+			sender.send(t.getList());
+		}catch(Exception e) {
+			if(!(e instanceof IllegalArgumentException))
+				sender.send(e);
+			throw e;
+		}
 	}
 
 	@Override
-	public void process(TransportDetails.Command cmd) throws Exception {
-		sender.send(transportManagementService.process(cmd));				
+	public void process(TransportDetails.Command cmd) throws Throwable {
+		try{
+			sender.send(transportManagementService.process(cmd, user));
+		}catch(GetListThrowable t) {
+			sender.send(t.getList());
+		}catch(Exception e) {
+			if(!(e instanceof IllegalArgumentException))
+				sender.send(e);
+			throw e;
+		}
 	}
 
 	@Override
-	public void process(TransportDocument.Command cmd) throws Exception {
-		sender.send(transportManagementService.process(cmd));				
+	public void process(TransportDocument.Command cmd) throws Throwable {
+		try{
+			sender.send(transportManagementService.process(cmd, user));	
+		}catch(GetListThrowable t) {
+			sender.send(t.getList());
+		}catch(Exception e) {
+			if(!(e instanceof IllegalArgumentException))
+				sender.send(e);
+			throw e;
+		}
 	}
 
 	@Override
-	public void process(User.Command cmd) throws Exception {
-		sender.send(transportManagementService.process(cmd));				
+	public void process(User.Command cmd) throws Throwable {
+		try{
+			sender.send(transportManagementService.process(cmd, user));	
+		}catch(GetListThrowable t) {
+			sender.send(t.getList());
+		}catch(Exception e) {
+			if(!(e instanceof IllegalArgumentException))
+				sender.send(e);
+			throw e;
+		}
 	}
-	
 }

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import de.ehealth.evek.type.Id;
+import de.ehealth.evek.type.Reference;
 import de.ehealth.evek.util.COptional;
 
 public record Address(
@@ -16,7 +17,7 @@ public record Address(
 		String city
 		) implements Serializable {
 
-	public static sealed interface Command extends Serializable permits Create, Delete, Update{
+	public static sealed interface Command extends Serializable permits Create, Delete, Update, Get, GetList{
 	}
 
 	public static record Create(COptional<String> name, String streetName, String  houseNumber, 
@@ -25,8 +26,11 @@ public record Address(
 	public static record Delete(Id<Address> id) implements Command {
 	}
 
-	public static record Update(Id<Address> id, COptional<String> name, String streetName, 
-			String houseNumber, String postCode, String city) implements Command {
+	public static record Update(Id<Address> id, COptional<String> name) implements Command {
+	}
+	public static record Get(Id<Address> id) implements Command {
+	}
+	public static record GetList(Filter filter) implements Command {	
 	}
 
 	public static record Filter(COptional<String> streetName, 
@@ -34,22 +38,27 @@ public record Address(
 	}
 
 	public static interface Operations {
-		Address process(Command cmd) throws Exception;
+		Address process(Command cmd, Reference<User> processingUser) throws Throwable;
 
 		List<Address> getAddress(Filter filter);
 
 		Address getAddress(Id<Address> id);
 	}
 
-	public Address updateWith(COptional<String> newName, String newStreetName, 
-			String newHouseNumber, String newPostCode, String newCity) {
-		return new Address(this.id, newName, newStreetName, newHouseNumber, this.country, newPostCode, newCity);
+	public Address updateWith(COptional<String> newName) {
+		return new Address(this.id, newName, this.streetName, this.houseNumber, this.country, this.postCode, this.city);
 	}
 	
 	public String toString() {
 		return String.format(
 				"Address[id=%s, name=%s, streetName=%s, houseNumber=%s, country=%s, postCode=%s, city=%s]", 
-				id, name, streetName, houseNumber,country, postCode, city);
+				this.id,
+				this.name,
+				this.streetName,
+				this.houseNumber,
+				this.country,
+				this.postCode,
+				this.city);
 	}
 	
 	

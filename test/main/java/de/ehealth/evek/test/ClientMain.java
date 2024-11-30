@@ -12,11 +12,8 @@ import de.ehealth.evek.entity.ServiceProvider;
 import de.ehealth.evek.entity.TransportDetails;
 import de.ehealth.evek.entity.TransportDocument;
 import de.ehealth.evek.entity.User;
-import de.ehealth.evek.network.ComServerSender;
 import de.ehealth.evek.test.network.ComClientReceiver;
 import de.ehealth.evek.test.network.ComClientSender;
-import de.ehealth.evek.type.Direction;
-import de.ehealth.evek.type.PatientCondition;
 import de.ehealth.evek.type.Reference;
 import de.ehealth.evek.type.TransportReason;
 import de.ehealth.evek.type.TransportationType;
@@ -53,18 +50,17 @@ public class ClientMain {
 					"spid-124", "SP", "Transportation", false, true, addressSP, COptional.empty());
 			
 			User.CreateFull crUser = new User.CreateFull(
-					"username", "LastTest", "PreTest", addressUser, sp, UserRole.superUser);
+					"username", "Passwort", "LastTest", "PreTest", addressUser, sp, UserRole.SuperUser);
+			
+			sender.loginUser(crUser.userName(), "Passwort");
+			User loginUser = receiver.receiveUser();
+			Log.sendMessage("loginUser: " + loginUser.toString());
+			Log.sendMessage("Successfully created user!");
 			
 			sender.sendUser(crUser);
 			Log.sendMessage("sentUser: " + crUser.toString());
 			User receivedUser = receiver.receiveUser();
 			Log.sendMessage("receivedUser: " + receivedUser.toString());
-
-			sender.loginUser(crUser.userName(), "PW");
-			User loginUser = receiver.receiveUser();
-			Log.sendMessage("loginUser: " + loginUser.toString());
-			Log.sendMessage("Successfully created user!");
-			
 			
 			
 			Address.Create crAddress = new Address.Create(COptional.of("AKK ES"), "Krastraße", "125", "de", "76253", "städten");
