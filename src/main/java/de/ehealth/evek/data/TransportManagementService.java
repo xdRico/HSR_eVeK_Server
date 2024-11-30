@@ -13,7 +13,6 @@ import de.ehealth.evek.entity.User;
 import de.ehealth.evek.exception.GetListThrowable;
 import de.ehealth.evek.exception.UserNameAlreadyUsedException;
 import de.ehealth.evek.exception.UserNotAllowedException;
-import de.ehealth.evek.exception.WrongCredentialsError;
 import de.ehealth.evek.type.Id;
 import de.ehealth.evek.type.Reference;
 import de.ehealth.evek.util.COptional;
@@ -30,17 +29,51 @@ public class TransportManagementService implements ITransportManagementService {
 	}
 	
 	
+	private InsuranceData process(InsuranceData.Create create, User user, boolean isInternal) throws Exception{
+		COptional<InsuranceData> optInsuranceData = repo.getInsuranceData(create);
+		if(optInsuranceData.isPresent())
+			return optInsuranceData.get();
+		
+		if(!isInternal) {
+			var obj = repo.getPatient(create.patient().id())
+					.orElseThrow(() -> new IllegalArgumentException("Invalid Patient ID"));
+			var objIns = repo.getInsuranceData(obj.insuranceData().id())
+					.orElseThrow(() -> new IllegalArgumentException("Invalid Insurance Data ID"));
+		
+			if(user.role() != SuperUser 
+					&& user.serviceProvider().id().value().toString() != create.insurance().id().value().toString()
+					&& objIns.insurance().id().value().toString() != create.insurance().id().value().toString())
+				throw new UserNotAllowedException("User can't create Patients for another Insurance!", user.id(), user.role());
+		}
+		var objCreate = new InsuranceData(repo.InsuranceDataID(), 
+				create.patient(),
+				create.insurance(),
+				create.insuranceStatus());
+		
+		repo.save(objCreate);
+		
+		return objCreate;
+	}
+
+
 	@Override
 	public Address process(Address.Command cmd, Reference<User> processingUser) throws Throwable {
 		
-		User user = repo.getUser(processingUser.id())
-				.orElseThrow(() -> new RuntimeException("Processing user not found!"));
-		if(!user.role().getAllowedActions().contains(cmd.getClass()))
-			throw new UserNotAllowedException(user.id(), user.role());
+		User user;
+		if(!(!repo.hasUsers() && processingUser == null)) {
+			user = repo.getUser(processingUser.id())
+					.orElseThrow(() -> new RuntimeException("Processing user not found!"));
+			if(!user.role().getAllowedActions().contains(cmd.getClass()))
+				throw new UserNotAllowedException(user.id(), user.role());
+		}else user = new User(null, null, null, null, null, SuperUser);
 		
 		return switch(cmd){
 		
 			case Address.Create create -> { 
+				
+				COptional<Address> optAddress = repo.getAddress(create);
+				if(optAddress.isPresent())
+					yield optAddress.get();
 				
 				var obj = new Address(repo.AddressID(), 
 						create.name(),
@@ -86,8 +119,6 @@ public class TransportManagementService implements ITransportManagementService {
 	}
 
 	
-	//TODO TransportManagementService - Security: Roles and Rights!
-
 	@Override
 	public List<Address> getAddress(Address.Filter filter) {	
 		return repo.getAddress(filter);
@@ -196,24 +227,7 @@ public class TransportManagementService implements ITransportManagementService {
 		
 			case InsuranceData.Create create -> { 
 				
-				var obj = repo.getPatient(create.patient().id())
-						.orElseThrow(() -> new IllegalArgumentException("Invalid Insurance Data ID"));
-				var objIns = repo.getInsuranceData(obj.insuranceData().id())
-						.orElseThrow(() -> new IllegalArgumentException("Invalid Insurance Data ID"));
-			
-				if(user.role() != SuperUser 
-						&& user.serviceProvider().id().value().toString() != create.insurance().id().value().toString()
-						&& objIns.insurance().id().value().toString() != create.insurance().id().value().toString())
-					throw new UserNotAllowedException("User can't create Patients for another Insurance!", user.id(), user.role());
-					
-				var objCreate = new InsuranceData(repo.InsuranceDataID(), 
-						create.patient(),
-						create.insurance(),
-						create.insuranceStatus());
-				
-				repo.save(objCreate);
-				
-				yield objCreate;
+				yield process(create, user, false);
 			}
 			
 			case InsuranceData.Delete delete -> {
@@ -234,7 +248,6 @@ public class TransportManagementService implements ITransportManagementService {
 			}
 		};
 	}
-
 
 	@Override
 	public List<InsuranceData> getInsuranceData(InsuranceData.Filter filter) {	
@@ -339,6 +352,25 @@ public class TransportManagementService implements ITransportManagementService {
 				yield obj;
 			}
 			
+			case Patient.CreateWithInsuranceData create -> { 
+				
+				if(user.role() != SuperUser && user.serviceProvider().id().value().toString() != create.insurance().id().value().toString())
+					throw new UserNotAllowedException("User can't create Patients for another Insurance!", user.id(), user.role());
+				InsuranceData insuranceData = process(
+						new InsuranceData.Create(Reference.to(create.insuranceNumber()), create.insurance(), create.insuranceStatus()), 
+						user, true);
+				
+				var obj = new Patient(repo.PatientID(create.insuranceNumber()), 
+						Reference.to(insuranceData.id().value().toString()),
+						create.lastName(),
+						create.firstName(),
+						create.birthDate(),
+						create.address());
+
+				repo.save(obj);
+				
+				yield obj;
+			}
 			case Patient.Delete delete -> {
 				
 				var deleteObj = repo.getPatient(delete.insuranceNumber())
@@ -366,7 +398,7 @@ public class TransportManagementService implements ITransportManagementService {
 				if(user.role() != SuperUser && user.serviceProvider().id().value().toString() != objIns.insurance().id().value().toString())
 					throw new UserNotAllowedException("User can't update Patients of another Insurance!", user.id(), user.role());
 					
-				var updateObj = obj.updateWith(update.insuranceData(),
+				var updateObj = obj.updateWith(
 								update.lastName(),
 								update.firstName(),
 								update.address());
@@ -375,16 +407,34 @@ public class TransportManagementService implements ITransportManagementService {
 			
 				yield updateObj;
 			}
+			case Patient.UpdateInsuranceData update -> {
+				var obj = repo.getPatient(update.insuranceNumber())
+						.orElseThrow(() -> new IllegalArgumentException("Invalid Patient ID"));
+				var objIns = repo.getInsuranceData(obj.insuranceData().id())
+						.orElseThrow(() -> new IllegalArgumentException("Invalid Insurance Data ID"));
+				
+				if(user.role() != SuperUser && user.serviceProvider().id().value().toString().equals(
+						objIns.insurance().id().value().toString()))
+					throw new UserNotAllowedException("User can't update Patients of another Insurance!", user.id(), user.role());
+						
+				var updateObj = obj.updateInsuranceData(Reference.to(update.insuranceData().id().value().toString()));
+				
+				repo.save(updateObj);
+			
+				yield updateObj;
+			}
+			
 			case Patient.Move move -> {
 				var obj = repo.getPatient(move.insuranceNumber())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Patient ID"));
 				var objIns = repo.getInsuranceData(obj.insuranceData().id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Insurance Data ID"));
 				
-				if(user.role() != SuperUser && user.serviceProvider().id().value().toString() != objIns.insurance().id().value().toString())
+				if(user.role() != SuperUser && user.serviceProvider().id().value().toString().equals(
+						objIns.insurance().id().value().toString()))
 					throw new UserNotAllowedException("User can't update Patients of another Insurance!", user.id(), user.role());
 						
-				var updateObj = obj.updateWith(move.address());
+				var updateObj = obj.updateAddress(move.address());
 				
 				repo.save(updateObj);
 			
@@ -465,11 +515,14 @@ public class TransportManagementService implements ITransportManagementService {
 	
 	@Override
 	public ServiceProvider process(ServiceProvider.Command cmd, Reference<User> processingUser) throws Throwable {
+		User user;
+		if(!(!repo.hasUsers() && processingUser == null)) {
+			user = repo.getUser(processingUser.id())
+					.orElseThrow(() -> new RuntimeException("Processing user not found!"));
+			if(!user.role().getAllowedActions().contains(cmd.getClass()))
+				throw new UserNotAllowedException(user.id(), user.role());
+		}else user = new User(null, null, null, null, null, SuperUser);
 		
-		User user = repo.getUser(processingUser.id())
-				.orElseThrow(() -> new RuntimeException("Processing user not found!"));
-		if(!user.role().getAllowedActions().contains(cmd.getClass()))
-			throw new UserNotAllowedException(user.id(), user.role());
 		
 		return switch(cmd){
 		
@@ -822,12 +875,18 @@ public class TransportManagementService implements ITransportManagementService {
 	@Override
 	public User process(User.Command cmd, Reference<User> processingUser) throws Throwable {
 		User user = null;
-		if(!(processingUser == null && cmd instanceof User.LoginUser)) {;
+		if(!(processingUser == null
+				&& (cmd instanceof User.LoginUser 
+						|| (cmd instanceof User.CreateFull
+								&&  !repo.hasUsers())))) {
 			user = repo.getUser(processingUser.id())
 					.orElseThrow(() -> new RuntimeException("Processing user not found!"));
 			if(!user.role().getAllowedActions().contains(cmd.getClass()))
 				throw new UserNotAllowedException(user.id(), user.role());
-		}
+		}else if(!repo.hasUsers() 
+				&& cmd instanceof User.CreateFull)
+			user = new User(null, null, null, null, null, SuperUser);
+		
 		return switch(cmd){
 		
 			case User.Create create -> { 
@@ -866,6 +925,7 @@ public class TransportManagementService implements ITransportManagementService {
 			
 			case User.CreateFull create -> { 
 				
+				
 				Address address = process(create.addressCmd(), processingUser);
 				ServiceProvider sp = process(create.serviceProviderCmd(), processingUser);
 				
@@ -875,8 +935,10 @@ public class TransportManagementService implements ITransportManagementService {
 						Reference.to(address.id().value().toString()),
 						Reference.to(sp.id().value().toString()),
 						create.role());
-				
 				repo.save(obj);
+				
+				var loginObj = new User.LoginUser(create.userName(), create.password());
+				repo.save(loginObj);
 				
 				yield obj;
 			}
@@ -888,7 +950,6 @@ public class TransportManagementService implements ITransportManagementService {
 						&& user.serviceProvider() != deleteObj.serviceProvider())
 					throw new UserNotAllowedException("User can't delete a user for another Service Provider!", 
 							user.id(), user.role());
-				
 				repo.delete(deleteObj);
 				
 				yield deleteObj;
@@ -918,8 +979,7 @@ public class TransportManagementService implements ITransportManagementService {
 				yield updateObj;
 			}
 			case User.UpdateCredentials update ->{
-				if(!repo.loginCredentials(new User.LoginUser(update.oldUserName().value().toString(), update.oldPassword())))
-					throw new WrongCredentialsError();
+				repo.loginCredentials(new User.LoginUser(update.oldUserName().value().toString(), update.oldPassword()));
 				if(repo.getUser(update.newUserName()) != null)
 					throw new UserNameAlreadyUsedException(update.newUserName());
 				var updateObj  = repo.getUser(update.oldUserName())
@@ -930,9 +990,7 @@ public class TransportManagementService implements ITransportManagementService {
 				yield updateObj;
 			}
 			case User.LoginUser login ->{
-				var loginObj  = repo.getUser(login.userName())
-						.orElseThrow(() -> new IllegalArgumentException("Invalid User ID"));
-				yield loginObj;
+				yield repo.loginCredentials(login);
 			}
 			case User.Get get -> {
 				yield repo.getUser(get.id())

@@ -27,6 +27,7 @@ import de.ehealth.evek.entity.TransportDocument;
 import de.ehealth.evek.entity.User;
 import de.ehealth.evek.entity.User.LoginUser;
 import de.ehealth.evek.exception.IsArchivedException;
+import de.ehealth.evek.exception.WrongCredentialsException;
 import de.ehealth.evek.type.Direction;
 import de.ehealth.evek.type.Id;
 import de.ehealth.evek.type.PatientCondition;
@@ -116,7 +117,7 @@ public class JDBCRepository implements IRepository {
 					"streetName" VARCHAR(255) NOT NULL,
 					"houseNumber" VARCHAR(10) NOT NULL,
 					"country" VARCHAR(63) NOT NULL,
-					"postCode" INTEGER NOT NULL,
+					"postCode" VARCHAR(10) NOT NULL,
 					"city" VARCHAR(255) NOT NULL
 				);
 				""";
@@ -132,10 +133,15 @@ public class JDBCRepository implements IRepository {
 		private static final String CREATE_TABLE_INSURANCEDATA = """
 			CREATE TABLE IF NOT EXISTS "insuranceData" (
 					"insuranceDataId" UUID NOT NULL PRIMARY KEY,
-					"patient" VARCHAR(10) NOT NULL,
 					"insurance" VARCHAR(9) NOT NULL REFERENCES "insurance"("insuranceId"),
 					"insuranceStatus" INTEGER NOT NULL
 				);
+				""";
+		private static final String CREATE_TABLE_INSURANCEDATA_PATIENT = """
+				CREATE TABLE IF NOT EXISTS "insuranceDataPatient" (
+					"insuranceData" UUID NOT NULL UNIQUE REFERENCES "insuranceData"("insuranceDataId"),
+					"patient" VARCHAR(10) NOT NULL
+					);
 				""";
 
 //		private static final String CREATE_TABLE_INVOICE = "";
@@ -234,6 +240,7 @@ public class JDBCRepository implements IRepository {
 				stmt.execute(CREATE_TABLE_INSURANCEDATA);
 //				stmt.execute(CREATE_TABLE_INVOICE);
 				stmt.execute(CREATE_TABLE_PATIENT);
+				stmt.execute(CREATE_TABLE_INSURANCEDATA_PATIENT);
 //				stmt.execute(CREATE_TABLE_PROTOCOL);
 				stmt.execute(CREATE_TABLE_SERVICEPROVIDER);
 				stmt.execute(CREATE_TABLE_USER);
@@ -249,6 +256,52 @@ public class JDBCRepository implements IRepository {
 
 		private static String selectAllSQL(String table, String key, String keyData) {
 			return String.format("SELECT * FROM \"%s\" WHERE \"%s\" = '%s'", table, key, keyData);
+		}
+		
+		private static String selectAllSQL(String table, String[] key, Object[] keyData) throws RuntimeException{
+			if(key.length != keyData.length)
+				throw new RuntimeException("Not equal amount of keys and key data!");
+			
+			if(key.length == 1)
+				return selectAllSQL(table, key[0], keyData[0].toString());
+
+			String s = String.format("\"%s\" = '%s'", key[0], keyData[0]);
+			for(int i = 1; i < key.length; i++) {
+				if(keyData[i] == null)
+					s += String.format(" AND \"%s\" IS NULL", key[i]);
+				else
+					s += String.format(" AND \"%s\" = '%s'", key[i], keyData[i]);
+			}
+			return String.format("SELECT * FROM \"%s\" WHERE %s", table, s);
+
+		}
+		
+		private static String selectSQL(String table, String[] visualKeys, String[] key, Object[] keyData) throws RuntimeException{
+			if(key.length != keyData.length)
+				throw new RuntimeException("Not equal amount of keys and key data!");
+			
+			if(key.length == 1)
+				return selectAllSQL(table, key[0], keyData[0].toString());
+			
+			String v = String.format("\"%s\"", visualKeys[0]);
+			for(int i = 1; i < visualKeys.length; i++)
+				v += String.format(" ,\"%s\"", visualKeys[i]);
+			
+			String s = String.format("\"%s\" = '%s'", key[0], keyData[0]);
+			for(int i = 1; i < key.length; i++)
+				if(keyData[i] == null)
+					s += String.format(" AND \"%s\" IS NULL", key[i]);
+				else
+					s += String.format(" AND \"%s\" = '%s'", key[i], keyData[i]);
+			
+			return String.format("SELECT %s FROM %s WHERE %s", v, table, s);
+
+		}
+		
+		
+		private static String selectAllSQL(String table) {
+			return String.format("SELECT * FROM \"%s\"", table);
+
 		}
 		
 		/**
@@ -300,13 +353,17 @@ public class JDBCRepository implements IRepository {
 		 * @param insuranceData - the Insurance Data to be added
 		 * @return String - the SQL Command as String
 		 */
-		private static String insertSQL(InsuranceData insuranceData) {
-			 return INSERT_INTO("insuranceData")
+		private static String[] insertSQL(InsuranceData insuranceData) {
+			 return new String[]{INSERT_INTO("insuranceData")
 					 .VALUE("insuranceDataId", insuranceData.id().value().toString())
-					 .VALUE("patient", insuranceData.patient().id().value().toString())
 					 .VALUE("insurance", insuranceData.insurance().id().value().toString())
 					 .VALUE("insuranceStatus", insuranceData.insuranceStatus())
-					 .toString();
+					 .toString(), 
+					 INSERT_INTO("insuranceDataPatient")
+					 .VALUE("insuranceData", insuranceData.id().value().toString())
+					 .VALUE("patient", insuranceData.patient().id().value().toString())
+					 .toString()
+			 };
 		}
 		
 //		/**
@@ -563,13 +620,18 @@ public class JDBCRepository implements IRepository {
 		 * @param insuranceData - the Insurance Data to be updated
 		 * @return String - the SQL Command as String
 		 */
-		private static String updateSQL(InsuranceData insuranceData) {
-			 return UPDATE("insuranceData")
-					 .WHERE("insuranceDataId", insuranceData.id().value().toString())
-					 .SET("patient", insuranceData.patient().id().value().toString())
-					 .SET("insurance", insuranceData.insurance().id().value().toString())
-					 .SET("insuranceStatus", insuranceData.insuranceStatus())
-					 .toString();
+		private static String[] updateSQL(InsuranceData insuranceData) {
+			return new String[] {
+					UPDATE("insuranceData")
+					.WHERE("insuranceDataId", insuranceData.id().value().toString())
+					.SET("insurance", insuranceData.insurance().id().value().toString())
+					.SET("insuranceStatus", insuranceData.insuranceStatus())
+					.toString(),
+					UPDATE("insuranceDataPatient")
+					.WHERE("insuranceData", insuranceData.id().value().toString())
+					.SET("patient", insuranceData.patient().id().value().toString())
+					.toString()
+			};
 		}
 		
 //		/**
@@ -816,10 +878,15 @@ public class JDBCRepository implements IRepository {
 		 * @param insuranceData - the Insurance Data to be deleted
 		 * @return String - the SQL Command as String
 		 */
-		private static String deleteSQL(InsuranceData insuranceData) {
-			 return DELETE_FROM("insuranceData")
-					 .WHERE("insuranceDataId", insuranceData.id().value().toString())
-					 .toString();
+		private static String[] deleteSQL(InsuranceData insuranceData) {
+			return new String[] {
+					DELETE_FROM("insuranceData")
+					.WHERE("insuranceDataId", insuranceData.id().value().toString())
+					.toString(), 
+					DELETE_FROM("insuranceDataPatient")
+					.WHERE("insuranceData", insuranceData.id().value().toString())
+					.toString()
+			};
 		}
 		
 //		/**
@@ -920,11 +987,16 @@ public class JDBCRepository implements IRepository {
 					 .toString();
 		}
 		
+		private static String deleteSQL(Id<User> loginUser) {
+			 return DELETE_FROM("login")
+					 .WHERE("user", loginUser.value().toString())
+					 .toString();
+		}
+		
 		
 		
 		
 		//TODO JDBCRepository - Reading Optionals from DB: new Method COptional.get / COptional.read!
-		//TODO Entities - Command get... for Communication with Client!
 		
 		/**
 		 * static readAddress
@@ -938,6 +1010,7 @@ public class JDBCRepository implements IRepository {
 		private static Address readAddress(ResultSet rs) throws SQLException {
 			COptional<String> name = COptional.empty();
 			if(rs.getString("name") != null 
+					&& rs.getString("name") != "null"
 					&& !rs.getString("name").equalsIgnoreCase("")) {
 				name = COptional.of(rs.getString("name"));
 			}
@@ -947,7 +1020,7 @@ public class JDBCRepository implements IRepository {
 					rs.getString("streetName"),
 					rs.getString("houseNumber"),
 					rs.getString("country"),
-					rs.getString("streetName"),
+					rs.getString("postCode"),
 					rs.getString("city"));
 		}
 		
@@ -975,11 +1048,42 @@ public class JDBCRepository implements IRepository {
 		 * @return InsuranceData - the existing Insurance Data
 		 * @throws SQLException - if no Result was found
 		 */
-		private static InsuranceData readInsuranceData(ResultSet rs) throws SQLException {
-			return new InsuranceData(new Id<>(rs.getString("insuranceDataId")), 
-					Reference.to(rs.getString("patient")),
+		private InsuranceData readInsuranceData(ResultSet rs) throws SQLException {
+			Id<InsuranceData> id = new Id<>(rs.getString("insuranceDataId"));
+			return new InsuranceData(id, 
+					Reference.to(getInsuranceDataPatient(id).value().toString()),
 					Reference.to(rs.getString("insurance")),
 					rs.getInt("insuranceStatus"));
+		}
+		
+		/**
+		 * static readInsuranceData
+		 * 
+		 * Method returning an existing Insurance Data from the Database or throwing an SQLException
+		 * 
+		 * @param rs - the ResultSet returned by the database
+		 * @return InsuranceData - the existing Insurance Data
+		 * @throws SQLException - if no Result was found
+		 */
+		private static InsuranceData readInsuranceData(ResultSet rs, Id<Patient> patient) throws SQLException {
+			Id<InsuranceData> id = new Id<>(rs.getString("insuranceDataId"));
+			return new InsuranceData(id, 
+					Reference.to(patient.value().toString()),
+					Reference.to(rs.getString("insurance")),
+					rs.getInt("insuranceStatus"));
+		}
+		
+		/**
+		 * static readInsuranceDataPatient
+		 * 
+		 * Method returning an existing Patient of Insurance Data from the Database or throwing an SQLException
+		 * 
+		 * @param rs - the ResultSet returned by the database
+		 * @return Insurance - the existing Patient of Insurance Data
+		 * @throws SQLException - if no Result was found
+		 */
+		private static Id<Patient> readInsuranceDataPatient(ResultSet rs) throws SQLException {
+			return new Id<>(rs.getString("patient"));
 		}
 		
 //		/**
@@ -1038,6 +1142,7 @@ public class JDBCRepository implements IRepository {
 		private static ServiceProvider readServiceProvider(ResultSet rs) throws SQLException {
 			COptional<String> contactInfo = COptional.empty();
 			if(rs.getString("contactInfo") != null 
+					&& rs.getString("contactInfo") != "null" 
 					&& !rs.getString("contactInfo").equalsIgnoreCase("")) {
 				contactInfo = COptional.of(rs.getString("contactInfo"));
 			}
@@ -1071,42 +1176,52 @@ public class JDBCRepository implements IRepository {
 			COptional<String> transporterSignature = COptional.empty();
 			COptional<Date> transporterSignatureDate = COptional.empty();
 			if(rs.getString("startAddress") != null 
+					&& rs.getString("startAddress") != "null"
 					&& !rs.getString("startAddress").equalsIgnoreCase("")) {
 				startAddress = COptional.of(Reference.to(rs.getString("startAddress")));
 			}
-			if(rs.getString("endAddress") != null 
+			if(rs.getString("endAddress") != null
+					&& rs.getString("endAddress") != "null"
 					&& !rs.getString("endAddress").equalsIgnoreCase("")) {
 				endAddress = COptional.of(Reference.to(rs.getString("endAddress")));
 			}
 			if(rs.getString("direction") != null 
+					&& rs.getString("direction") != "null" 
 					&& !rs.getString("direction").equalsIgnoreCase("")) {
 				direction = COptional.of(Direction.valueOf(rs.getString("direction")));
 			}
 			if(rs.getString("patientCondition") != null 
+					&& rs.getString("patientCondition") != "null" 
 					&& !rs.getString("patientCondition").equalsIgnoreCase("")) {
 				patientCondition = COptional.of(PatientCondition.valueOf(rs.getString("patientCondition")));
 			}
 			if(rs.getString("tourNumber") != null 
+					&& rs.getString("tourNumber") != "null" 
 					&& !rs.getString("tourNumber").equalsIgnoreCase("")) {
 				tourNumber = COptional.of(rs.getString("tourNumber"));
 			}
 			if(rs.getString("paymentExemption") != null 
+					&& rs.getString("paymentExemption") != "null" 
 					&& !rs.getString("paymentExemption").equalsIgnoreCase("")) {
 				paymentExemption = COptional.of(rs.getBoolean("paymentExemption"));
 			}	
 			if(rs.getString("patientSignature") != null 
+					&& rs.getString("patientSignature") != "null" 
 					&& !rs.getString("patientSignature").equalsIgnoreCase("")) {
 				patientSignature = COptional.of(rs.getString("patientSignature"));
 			}
 			if(rs.getString("patientSignatureDate") != null 
+					&& rs.getString("patientSignatureDate") != "null" 
 					&& !rs.getString("patientSignatureDate").equalsIgnoreCase("")) {
 				patientSignatureDate = COptional.of(rs.getDate("patientSignatureDate"));
 			}
 			if(rs.getString("transporterSignature") != null 
+					&& rs.getString("transporterSignature") != "null" 
 					&& !rs.getString("transporterSignature").equalsIgnoreCase("")) {
 				transporterSignature = COptional.of(rs.getString("transporterSignature"));
 			}
 			if(rs.getString("transporterSignatureDate") != null 
+					&& rs.getString("transporterSignatureDate") != "null" 
 					&& !rs.getString("transporterSignatureDate").equalsIgnoreCase("")) {
 				transporterSignatureDate = COptional.of(rs.getDate("transporterSignatureDate"));
 			}
@@ -1143,19 +1258,23 @@ public class JDBCRepository implements IRepository {
 			COptional<String> additionalInfo = COptional.empty();
 			
 			if(rs.getString("patient") != null 
+					&& rs.getString("patient") != "null" 
 					&& !rs.getString("patient").equalsIgnoreCase("")) {
 				patient = COptional.of(Reference.to(rs.getString("patient")));
 			}
 			if(rs.getString("insuranceData") != null 
+					&& rs.getString("insuranceData") != "null" 
 					&& !rs.getString("insuranceData").equalsIgnoreCase("")) {
 				insuranceData = COptional.of(Reference.to(rs.getString("insuranceData")));
 			}
 			if(rs.getDate("endDate") != null
+					&& rs.getString("endDate") != "null" 
 					&& rs.getInt("weeklyFrequency") > -1) {
 				endDate = COptional.of(rs.getDate("endDate"));
 				weeklyFrequency = COptional.of(rs.getInt("weeklyFrequency"));
 			}
 			if(rs.getString("additionalInfo") != null 
+					&& rs.getString("additionalInfo") != "null" 
 					&& !rs.getString("additionalInfo").equalsIgnoreCase("")) {
 				additionalInfo = COptional.of(rs.getString("additionalInfo"));
 			}
@@ -1196,6 +1315,47 @@ public class JDBCRepository implements IRepository {
 		
 		
 		
+		private boolean getCredentials(Id<User> id) throws Exception {
+			try (var stmt = conn.createStatement();
+					var rs = stmt.executeQuery(selectAllSQL("login", "user", id.value()))) {
+				if(!rs.isClosed())
+					return rs.next(); 
+						
+				throw new RuntimeException();
+			}catch(SQLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
+		private String getPassword(Id<User> id) throws Exception {
+			try (var stmt = conn.createStatement();
+					var rs = stmt.executeQuery(selectAllSQL("login", "user", id.value()))) {
+				if(!rs.isClosed())
+					if (rs.next()) 
+						return rs.getString("password");
+				throw new RuntimeException();
+			}catch(SQLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		
+		
+		
+		
+		private Id<Patient> getInsuranceDataPatient(Id<InsuranceData> id) {
+			try (var stmt = conn.createStatement();
+					var rs = stmt.executeQuery(selectAllSQL("insuranceDataPatient", "insuranceData", id.value()))) {
+		
+				if(!rs.isClosed())
+					if (rs.next()) 
+						return readInsuranceDataPatient(rs);
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+			throw new RuntimeException();
+		}
+
 		@Override
 		public Id<Address> AddressID() {
 			return new Id<>(UUID.randomUUID().toString());
@@ -1254,7 +1414,7 @@ public class JDBCRepository implements IRepository {
 		@Override
 		public void save(Address address) throws Exception {
 			try (var stmt = conn.createStatement()) {
-				var sql = getAddress(address.id()).isPresent() 
+				var sql = getAddress(address.id()).isPresent()
 						? updateSQL(address) : insertSQL(address);
 				stmt.executeUpdate(sql);
 			} catch (SQLException e) {
@@ -1278,7 +1438,8 @@ public class JDBCRepository implements IRepository {
 			try (var stmt = conn.createStatement()) {
 				var sql = getInsuranceData(insuranceData.id()).isPresent() 
 						? updateSQL(insuranceData) : insertSQL(insuranceData);
-				stmt.executeUpdate(sql);
+				for(String str : sql)
+					stmt.executeUpdate(str);
 			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}
@@ -1362,6 +1523,16 @@ public class JDBCRepository implements IRepository {
 			}
 		}
 		
+		@Override
+		public void save(User.LoginUser user) throws Exception {
+			try (var stmt = conn.createStatement()) {
+				var sql = getCredentials(getUser(user.userName()).get().id()) 
+						? updateSQL(user) : insertSQL(user);
+				stmt.executeUpdate(sql);
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+		}		
 		
 		
 		
@@ -1396,8 +1567,9 @@ public class JDBCRepository implements IRepository {
 				if(!getInsuranceData(insuranceData.id()).isPresent())
 					return;
 				var sql = deleteSQL(insuranceData);
-				stmt.executeUpdate(sql);
-			} catch (SQLException e) {
+				for(String str : sql)
+					stmt.executeUpdate(str);
+				} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}
 		}
@@ -1481,6 +1653,15 @@ public class JDBCRepository implements IRepository {
 					return;
 				var sql = deleteSQL(user);
 				stmt.executeUpdate(sql);
+				try {
+					if(!getCredentials(user.id()))
+						return;
+					sql = deleteSQL(user.id());
+					stmt.executeUpdate(sql);
+				}catch(Exception e) {
+					Log.sendException(e);
+					Log.sendMessage(String.format("Credentials for user %s could not be deleted!", user.toString()));
+				}
 			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}
@@ -1716,6 +1897,40 @@ public class JDBCRepository implements IRepository {
 		}
 
 		@Override
+		public COptional<Address> getAddress(Address.Create create) {
+			Object name = null;
+			if(create.name().isPresent())
+				name = create.name();
+
+			try (var stmt = conn.createStatement();
+					var rs = stmt.executeQuery(selectAllSQL(
+							"address", 
+							new String[] {
+									"city",
+									"country",
+									"houseNumber",
+									"name",
+									"postCode",
+									"streetName"
+							},
+							new Object[]{
+									create.city(),
+									create.country(),
+									create.houseNumber(),
+									name,
+									create.postCode(),
+									create.streetName()
+							}))) {
+				if(!rs.isClosed())
+					if (rs.next()) 
+						return COptional.of(readAddress(rs));
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+			return COptional.empty();
+		}
+		
+		@Override
 		public COptional<Insurance> getInsurance(Id<Insurance> id) {
 			try (var stmt = conn.createStatement();
 					var rs = stmt.executeQuery(selectAllSQL("insurance", "insuranceId", id.value()))) {
@@ -1734,15 +1949,63 @@ public class JDBCRepository implements IRepository {
 					var rs = stmt.executeQuery(selectAllSQL("insuranceData", "insuranceDataId", id.value()))) {
 
 				if(!rs.isClosed())
-					if (rs.next()) 
-						return COptional.of(readInsuranceData(rs));
+					if (rs.next()) {
+						return COptional.of(readInsuranceData(rs, getInsuranceDataPatient(id)));
+					}
 			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}
 			return COptional.empty();
 		}
 		
-//		@Override
+		@Override
+		public COptional<InsuranceData> getInsuranceData(InsuranceData.Create create) {
+			try (var stmt = conn.createStatement();
+					var rs = stmt.executeQuery(selectSQL(
+							"\"insuranceData\" INNER JOIN \"insuranceDataPatient\" ON \"insuranceData\".\"insuranceDataId\" "
+							+ "= \"insuranceDataPatient\".\"insuranceData\"",
+							new String[] {
+									"insuranceDataId",
+									"insurance",
+									"insuranceStatus",
+									"patient"
+							},
+							new String[] {
+									"insurance",
+									"insuranceStatus",
+									"patient"
+							},
+							new Object[]{
+									create.insurance().id().value().toString(),
+									create.insuranceStatus(),
+									create.patient()
+							}))) {
+				if(!rs.isClosed())
+					if (rs.next()) 
+						return COptional.of(readInsuranceData(rs));
+			}catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+			try (var stmt = conn.createStatement();
+					var rs = stmt.executeQuery(selectAllSQL(
+							"insuranceData", 
+							new String[] {
+									"insurance",
+									"insuranceStatus",
+							},
+							new Object[]{
+									create.insurance().id().value().toString(),
+									create.insuranceStatus(),
+							}))) {
+					if(!rs.isClosed())
+						if (rs.next()) ; 
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+			return COptional.empty();
+		}
+		
+		//		@Override
 //		public COptional<Invoice> getInvoice(Id<Invoice> id) {
 //			try (var stmt = conn.createStatement();
 //				var rs = stmt.executeQuery(selectAllSQL("invoice", "invoiceId", id.value()))) {
@@ -1847,26 +2110,27 @@ public class JDBCRepository implements IRepository {
 			return COptional.empty();
 		}
 
-		private String getPassword(Id<User> id) throws Exception {
-			try (var stmt = conn.createStatement();
-					var rs = stmt.executeQuery(selectAllSQL("login", "user", id.value()))) {
-				if(!rs.isClosed())
-					if (rs.next()) 
-						return rs.getString("password");
-				throw new RuntimeException();
-			}catch(SQLException e) {
-				throw new RuntimeException(e);
+		@Override
+		public User loginCredentials(LoginUser login) throws WrongCredentialsException {
+			try {
+				User user = getUser(login.userName()).get();
+				if(!login.password().toString().equals(getPassword(user.id())))
+					throw new WrongCredentialsException();
+				return user;
+			} catch (Exception e) {
+				throw new WrongCredentialsException(e);
 			}
 		}
 		
 		@Override
-		public Boolean loginCredentials(LoginUser login) {
-			try {
-				User user = getUser(login.userName()).get();
-				return login.password() == getPassword(user.id());
-				
-			}catch(Exception e) {
+		public boolean hasUsers() {
+			try (var stmt = conn.createStatement();
+					var rs = stmt.executeQuery(selectAllSQL("user"))) {
+				if(!rs.isClosed())
+					return rs.next(); 
 				return false;
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
 			}
 		}
 		

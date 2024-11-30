@@ -51,18 +51,27 @@ public class ClientMain {
 			
 			User.CreateFull crUser = new User.CreateFull(
 					"username", "Passwort", "LastTest", "PreTest", addressUser, sp, UserRole.SuperUser);
-			
-			sender.loginUser(crUser.userName(), "Passwort");
-			User loginUser = receiver.receiveUser();
-			Log.sendMessage("loginUser: " + loginUser.toString());
-			Log.sendMessage("Successfully created user!");
-			
+			User loginUser;
+			try {
+				sender.loginUser(crUser.userName(), "Passwort");
+				loginUser = receiver.receiveUser();
+				Log.sendMessage("loginUser: " + loginUser.toString());
+				Log.sendMessage("Successfully created user!");
+				
+			}catch(Exception e) {
+				loginUser = null;
+			}
+		
 			sender.sendUser(crUser);
 			Log.sendMessage("sentUser: " + crUser.toString());
 			User receivedUser = receiver.receiveUser();
 			Log.sendMessage("receivedUser: " + receivedUser.toString());
-			
-			
+			if (loginUser == null) {
+				sender.loginUser(crUser.userName(), "Passwort");
+				loginUser = receiver.receiveUser();
+				Log.sendMessage("loginUser: " + loginUser.toString());
+				Log.sendMessage("Successfully created user!");
+			}
 			Address.Create crAddress = new Address.Create(COptional.of("AKK ES"), "Krastraße", "125", "de", "76253", "städten");
 			sender.sendAddress(crAddress);
 			Log.sendMessage("sentAddress: " + crAddress.toString());
@@ -79,16 +88,10 @@ public class ClientMain {
 			Log.sendMessage("receivedInsurance: " + receivedInsurance.toString());
 			Log.sendMessage("Successfully created Insurance!");
 
-			//TODO PROJECT - Current InsuranceData of Patient as separate Table?
 			
-			InsuranceData.Create crInsuranceData = new InsuranceData.Create(Reference.to("R920485575"), Reference.to(receivedInsurance.id().value().toString()), 1000000);
-			sender.sendInsuranceData(crInsuranceData);
-			Log.sendMessage("sentInsuranceData: " + crInsuranceData.toString());
-			InsuranceData receivedInsuranceData = receiver.receiveInsuranceData();
-			Log.sendMessage("receivedInsuranceData: " + receivedInsuranceData.toString());
-			Log.sendMessage("Successfully created InsuranceData!");
-
-			Patient.Create crPatient = new Patient.Create("R920485575", Reference.to(receivedInsuranceData.id().value().toString()), 
+			
+			Patient.CreateWithInsuranceData crPatient = new Patient.CreateWithInsuranceData(
+					"R920485575", Reference.to(receivedInsurance.id().value().toString()), 1000000,
 					"Paroten", "Heinse", Date.valueOf("1919-10-17"), Reference.to(receivedUser.address().id().value().toString()));
 			sender.sendPatient(crPatient);
 			Log.sendMessage("sentPatient: " + crPatient.toString());
@@ -96,6 +99,24 @@ public class ClientMain {
 			Log.sendMessage("receivedPatient: " + receivedPatient.toString());
 			Log.sendMessage("Successfully created Patient!");
 
+			
+			
+			crAddress = new Address.Create(COptional.of("AKK 420"), "Wedstraße", "69", "de", "54321", "Weden");
+			sender.sendAddress(crAddress);
+			receivedAddress = receiver.receiveAddress();
+			crInsurance = new Insurance.Create("108018420", "AKK 420", Reference.to(receivedAddress.id().value().toString())); 
+			sender.sendInsurance(crInsurance);
+			receivedInsurance = receiver.receiveInsurance();
+			InsuranceData.Create crInsuranceData = new InsuranceData.Create(
+					Reference.to(receivedPatient.insuranceNumber().value().toString()), 
+					Reference.to(receivedInsurance.id().value().toString()),
+					1000000);
+			sender.sendInsuranceData(crInsuranceData);
+			Log.sendMessage("sentInsuranceData: " + crInsuranceData.toString());
+			InsuranceData receivedInsuranceData = receiver.receiveInsuranceData();
+			Log.sendMessage("receivedInsuranceData: " + receivedInsuranceData.toString());
+			Log.sendMessage("Successfully created InsuranceData!");
+			
 			
 			
 			ServiceProvider.Create crServiceProvider = new ServiceProvider.Create("465869453", "SeriosTranspots", "RD", false, true, Reference.to(receivedAddress.id().value().toString()), COptional.empty());

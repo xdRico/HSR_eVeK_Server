@@ -17,26 +17,51 @@ public record Patient (
 		Reference<Address> address
 		) implements Serializable {
 
-	public static sealed interface Command extends Serializable permits Create, Delete, Move, Update, Get, GetList{
+	public static sealed interface Command extends Serializable permits Create, 
+	CreateWithInsuranceData, Delete, Move, Update, UpdateInsuranceData, Get, GetList{
 	}
 
-	public static record Create(String insuranceNumber, 
-			Reference<InsuranceData> insuranceData, String lastName,
-			String firstName, Date birthDate, Reference<Address> address) implements Command {
-	}
-
-	public static record Delete(Id<Patient> insuranceNumber) implements Command {
+	public static record Create(
+			String insuranceNumber, 
+			Reference<InsuranceData> insuranceData, 
+			String lastName,
+			String firstName, 
+			Date birthDate, 
+			Reference<Address> address) implements Command {
 	}
 	
-	public static record Move(Id<Patient> insuranceNumber, 
+	public static record CreateWithInsuranceData(
+			String insuranceNumber, 
+			Reference<Insurance> insurance, 
+			int insuranceStatus,
+			String lastName,
+			String firstName, 
+			Date birthDate, 
+			Reference<Address> address) implements Command {
+	}
+	
+	public static record Delete(
+			Id<Patient> insuranceNumber) implements Command {
+	}
+	
+	public static record Move(
+			Id<Patient> insuranceNumber, 
 			Reference<Address> address) implements Command {
 	}
 
-	public static record Update(Id<Patient> insuranceNumber, 
-			Reference<InsuranceData> insuranceData, String lastName,
-			String firstName, Reference<Address> address) implements Command {
+	public static record Update(
+			Id<Patient> insuranceNumber, 
+			String lastName,
+			String firstName, 
+			Reference<Address> address) implements Command {
 	}
 
+	public static record UpdateInsuranceData(
+			Id<Patient> insuranceNumber, 
+			Reference<InsuranceData> insuranceData) implements Command {
+		
+	}
+	
 	public static record Get(Id<Patient> id) implements Command {
 	}
 	public static record GetList(Filter filter) implements Command {
@@ -56,13 +81,15 @@ public record Patient (
 		Patient getPatient(Id<Patient> insuranceNumber);
 	}
 
-	public Patient updateWith(Reference<InsuranceData> newInsuranceData, 
-			String newLastName, String newFirstName, Reference<Address> newAddress) {
-		return new Patient(this.insuranceNumber, newInsuranceData, newLastName, newFirstName, this.birthDate, newAddress);
+	public Patient updateWith(String newLastName, String newFirstName, Reference<Address> newAddress) {
+		return new Patient(this.insuranceNumber, this.insuranceData, newLastName, newFirstName, this.birthDate, newAddress);
 	}
 	
-	public Patient updateWith(Reference<Address> newAddress) {
+	public Patient updateAddress(Reference<Address> newAddress) {
 		return new Patient(this.insuranceNumber, this.insuranceData, this.lastName, this.firstName, this.birthDate, newAddress);
+	}
+	public Patient updateInsuranceData(Reference<InsuranceData> newInsuranceData) {
+		return new Patient(this.insuranceNumber, newInsuranceData, this.lastName, this.firstName, this.birthDate, this.address);
 	}
 	
 	public String toString() {

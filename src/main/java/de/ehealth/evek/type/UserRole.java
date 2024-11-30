@@ -1,7 +1,6 @@
 package de.ehealth.evek.type;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import de.ehealth.evek.entity.Address;
@@ -91,6 +90,7 @@ public enum UserRole {
 	InsuranceUser(new Object[] {
 			InsuranceData.Create.class,
 			Patient.Create.class,
+			Patient.CreateWithInsuranceData.class,
 			Patient.Move.class,
 			Patient.Update.class,
 			TransportDocument.Archive.class
@@ -106,6 +106,7 @@ public enum UserRole {
 			InsuranceData.Create.class,
 			InsuranceData.Delete.class,
 			Patient.Create.class,
+			Patient.CreateWithInsuranceData.class,
 			Patient.Move.class,
 			Patient.Update.class,
 			Patient.Delete.class,

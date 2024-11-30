@@ -19,6 +19,10 @@ public interface IComServerReceiver {
 		
 		if(inputObject instanceof User.LoginUser) 
 			return setProcessingUser((User.LoginUser) inputObject);
+		if(inputObject instanceof User.CreateFull) {
+			process((User.CreateFull) inputObject);
+			return true;
+		}
 		
 		if(!hasProcessingUser())
 			throw new UserNotProvidedException();
@@ -42,7 +46,7 @@ public interface IComServerReceiver {
 		else if(inputObject instanceof TransportDocument.Command)
 			process((TransportDocument.Command) inputObject);
 		else if(inputObject instanceof User.Command)
-			process((User.Command) inputObject);	
+			process((User.Command) inputObject);
 		else return false;	
 		
 		return true;	

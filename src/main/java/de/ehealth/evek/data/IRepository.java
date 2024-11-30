@@ -19,6 +19,7 @@ import de.ehealth.evek.entity.TransportDetails;
 import de.ehealth.evek.entity.TransportDocument;
 import de.ehealth.evek.entity.User;
 import de.ehealth.evek.exception.ProviderNotFoundException;
+import de.ehealth.evek.exception.WrongCredentialsException;
 
 public interface IRepository {
 
@@ -219,7 +220,15 @@ public interface IRepository {
 	 */
 	void save(User user) throws Exception;
 	
-	
+	/**
+	 * save
+	 * 
+	 * Method to save User Login Data to the Database
+	 * 
+	 * @param user - the LoginUser to save
+	 * @throws Exception - Exception thrown when saving fails
+	 */
+	void save(User.LoginUser user) throws Exception;
 	
 	
 	
@@ -327,7 +336,7 @@ public interface IRepository {
 	
 	
 	
-	
+
 	
 	/**
 	 * getAddress
@@ -444,6 +453,16 @@ public interface IRepository {
 	COptional<Address> getAddress(Id<Address> id);
 	
 	/**
+	 * getAddress
+	 * 
+	 * Method to get an Address by its contents
+	 * 
+	 * @param id - the id of the Address
+	 * @return Address - the Address with the given ID
+	 */
+	COptional<Address> getAddress(Address.Create create);
+	
+	/**
 	 * getInsurance
 	 * 
 	 * Method to get an Insurance by its ID
@@ -462,6 +481,16 @@ public interface IRepository {
 	 * @return InsuranceData - the Insurance Data with the given ID
 	 */
 	COptional<InsuranceData> getInsuranceData(Id<InsuranceData> id);
+	
+	/**
+	 * getInsuranceData
+	 * 
+	 * Method to get Insurance Data by its contents
+	 * 
+	 * @param id - the id of the Insurance Data
+	 * @return InsuranceData - the Insurance Data with the given ID
+	 */
+	COptional<InsuranceData> getInsuranceData(InsuranceData.Create create);
 	
 //	/**
 //	 * getInvoice
@@ -544,14 +573,28 @@ public interface IRepository {
 	COptional<User> getUser(String id);
 	
 	/**
-	 * getUser
+	 * loginCredentials
 	 * 
-	 * Method to get an User by its ID
+	 * Method to check, if User.LoginUser contains valid login data
 	 * 
 	 * @param login - the User.LoginUser Command used for login
 	 * @return Boolean - the Boolean representing if the Credentials are right
 	 */
-	Boolean loginCredentials(User.LoginUser login);
+	User loginCredentials(User.LoginUser login) throws WrongCredentialsException;
+	
+	
+	
+	
+	
+	/**
+	 * hasUsers
+	 * 
+	 * Method to get an User by its ID
+	 * 
+	 * @return boolean - if Users exist in DB
+	 */
+	boolean hasUsers();
+	
 	
 	
 	
