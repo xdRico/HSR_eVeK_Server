@@ -26,6 +26,8 @@ public record TransportDocument(
 		boolean isArchived
 		) implements Serializable{
 	
+    private static final long serialVersionUID = 956735861385487658L;
+	
 	public static sealed interface Command extends Serializable permits Create, Update, AssignPatient, Archive, Delete, Get, GetList{
 	}
 	

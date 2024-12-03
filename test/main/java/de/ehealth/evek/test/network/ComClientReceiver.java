@@ -25,6 +25,7 @@ public class ComClientReceiver implements IComClientReceiver{
 		objReader = new ObjectInputStream(server.getInputStream());
 	}
 	
+	@Override
 	public Address receiveAddress() throws Exception {
 		Object object = objReader.readObject();
 		if(object instanceof Address) 
@@ -32,6 +33,7 @@ public class ComClientReceiver implements IComClientReceiver{
 		throw wrongObjectType(Address.class, object);
 	}
 	
+	@Override
 	public Insurance receiveInsurance() throws Exception {
 		Object object = objReader.readObject();
 		if(object instanceof Insurance) 
@@ -39,6 +41,7 @@ public class ComClientReceiver implements IComClientReceiver{
 		throw wrongObjectType(Insurance.class, object);
 	}
 	
+	@Override
 	public InsuranceData receiveInsuranceData() throws Exception {
 		Object object = objReader.readObject();
 		if(object instanceof InsuranceData) 
@@ -53,6 +56,7 @@ public class ComClientReceiver implements IComClientReceiver{
 //		else throw new WrongObjectTypeException(Invoice.class, object);
 //	}
 	
+	@Override
 	public Patient receivePatient() throws Exception {
 		Object object = objReader.readObject();
 		if(object instanceof Patient) 
@@ -67,6 +71,7 @@ public class ComClientReceiver implements IComClientReceiver{
 //		else throw new WrongObjectTypeException(Protocol.class, object);
 //	}
 	
+	@Override
 	public ServiceProvider receiveServiceProvider() throws Exception {
 		Object object = objReader.readObject();
 		if(object instanceof ServiceProvider) 
@@ -74,6 +79,7 @@ public class ComClientReceiver implements IComClientReceiver{
 		throw wrongObjectType(ServiceProvider.class, object);
 	}
 	
+	@Override
 	public TransportDetails receiveTransportDetails() throws Exception {
 		Object object = objReader.readObject();
 		if(object instanceof TransportDetails) 
@@ -81,6 +87,7 @@ public class ComClientReceiver implements IComClientReceiver{
 		throw wrongObjectType(TransportDetails.class, object);
 	}
 	
+	@Override
 	public TransportDocument receiveTransportDocument() throws Exception {
 		Object object = objReader.readObject();
 		if(object instanceof TransportDocument) 
@@ -88,6 +95,7 @@ public class ComClientReceiver implements IComClientReceiver{
 		throw wrongObjectType(TransportDocument.class, object);
 	}
 	
+	@Override
 	public User receiveUser() throws Exception {
 		Object object = objReader.readObject();
 		if(object instanceof User) 

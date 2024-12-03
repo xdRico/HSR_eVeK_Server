@@ -14,6 +14,9 @@ public record Insurance(
 		Reference<Address> address
 		) implements Serializable {
 	
+    private static final long serialVersionUID = -7469835782057358365L;
+
+	
 	public static sealed interface Command extends Serializable permits Create, Delete, Move, Update, Get, GetList {
 	}
 

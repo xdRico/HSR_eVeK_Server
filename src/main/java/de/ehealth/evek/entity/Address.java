@@ -17,6 +17,9 @@ public record Address(
 		String city
 		) implements Serializable {
 
+    private static final long serialVersionUID = -4714168968119491955L;
+
+	
 	public static sealed interface Command extends Serializable permits Create, Delete, Update, Get, GetList{
 	}
 

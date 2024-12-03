@@ -17,6 +17,9 @@ public record ServiceProvider(
 		COptional<String> contactInfo
 		) implements Serializable {
 
+    private static final long serialVersionUID = 625732975895345128L;
+
+	
 	public static sealed interface Command extends Serializable permits Create, CreateFull, Delete, Move, Update, UpdateService, Get, GetList {
 	}
 

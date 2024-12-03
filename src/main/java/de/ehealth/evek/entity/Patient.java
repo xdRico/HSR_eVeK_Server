@@ -17,6 +17,9 @@ public record Patient (
 		Reference<Address> address
 		) implements Serializable {
 
+    private static final long serialVersionUID = -6497523187564893515L;
+
+	
 	public static sealed interface Command extends Serializable permits Create, 
 	CreateWithInsuranceData, Delete, Move, Update, UpdateInsuranceData, Get, GetList{
 	}

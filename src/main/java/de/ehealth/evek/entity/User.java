@@ -17,6 +17,9 @@ public record User(
 		UserRole role
 		) implements Serializable {
 
+    private static final long serialVersionUID = -3485673255491246872L;
+
+	
 	public static sealed interface Command extends Serializable permits Create, CreateFull, Update, Delete, UpdateRole, UpdateCredentials, LoginUser, Get, GetList {		
 	}
 	

@@ -3,6 +3,7 @@ package de.ehealth.evek.network;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
 import de.ehealth.evek.data.ITransportManagementService;
 import de.ehealth.evek.entity.Address;
@@ -31,7 +32,7 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 	private ObjectInputStream objReader;
 	private final ITransportManagementService transportManagementService;
 	
-	public ComServerReceiver(Socket socket, ITransportManagementService transportManagementService, IComServerSender sender) throws IOException {
+	public ComServerReceiver(Socket socket, ITransportManagementService transportManagementService, IComServerSender sender) throws IOException, SocketException {
 		this.transportManagementService = transportManagementService;
 		this.socket = socket;
 		this.sender = sender;

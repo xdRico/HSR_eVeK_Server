@@ -26,6 +26,8 @@ public record TransportDetails (
 		COptional<String> transporterSignature,
 		COptional<Date> transporterSignatureDate
 		) implements Serializable {
+	
+    private static final long serialVersionUID = 6359875465658792642L;
 
 	public static sealed interface Command extends Serializable permits Create, Delete, Update, UpdatePatientSignature, UpdateTransporterSignature, Get, GetList{
 	}

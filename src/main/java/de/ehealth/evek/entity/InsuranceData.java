@@ -14,6 +14,9 @@ public record InsuranceData(
 		int insuranceStatus
 		) implements Serializable {
 	
+    private static final long serialVersionUID = -946751378556315875L;
+
+	
 	public static sealed interface Command extends Serializable permits Create, Delete, Get, GetList{
 	}
 	
