@@ -1,17 +1,13 @@
-module hsr_evek_server {
-	exports de.ehealth.evek.data;
-	exports de.ehealth.evek.db;
-	exports de.ehealth.evek.util;
-	exports de.ehealth.evek.test;
-	exports de.ehealth.evek.network;
-	exports de.ehealth.evek.network.interfaces;
-	exports de.ehealth.evek.entity;
-	exports de.ehealth.evek.core;
-	exports de.ehealth.evek.type;
+module evek.server {
+	exports de.ehealth.evek.server.data;
+	exports de.ehealth.evek.server.db;
+	exports de.ehealth.evek.server.network;
+	exports de.ehealth.evek.server.core;
 
 	requires transitive java.sql;
+	requires transitive evek.api;
 	
-	uses de.ehealth.evek.data.IRepository.IRepositoryProvider;
+	uses de.ehealth.evek.server.data.IRepository.IRepositoryProvider;
 	
-	provides de.ehealth.evek.data.IRepository.IRepositoryProvider with de.ehealth.evek.db.JDBCRepository.RepositoryProvider;
+	provides de.ehealth.evek.server.data.IRepository.IRepositoryProvider with de.ehealth.evek.server.db.JDBCRepository.RepositoryProvider;
 }
