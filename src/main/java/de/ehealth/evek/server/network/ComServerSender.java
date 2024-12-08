@@ -1,9 +1,8 @@
 package de.ehealth.evek.server.network;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.List;
+import java.util.ArrayList;
 
 import de.ehealth.evek.api.entity.Address;
 import de.ehealth.evek.api.entity.Insurance;
@@ -13,74 +12,69 @@ import de.ehealth.evek.api.entity.ServiceProvider;
 import de.ehealth.evek.api.entity.TransportDetails;
 import de.ehealth.evek.api.entity.TransportDocument;
 import de.ehealth.evek.api.entity.User;
+import de.ehealth.evek.api.network.ComEncryptionKey;
+import de.ehealth.evek.api.network.interfaces.ComSender;
 import de.ehealth.evek.api.network.interfaces.IComServerSender;
-import de.ehealth.evek.api.type.Reference;
-import de.ehealth.evek.api.util.Log;
 
-public class ComServerSender implements IComServerSender {
-	
-	Reference<User> user;
-	ObjectOutputStream objSender;
+public class ComServerSender extends ComSender implements IComServerSender {
 	
 	public ComServerSender(Socket client) throws IOException {
-		try {
-			//this.outputStream =  new PrintWriter(client.getOutputStream(), true);
-			this.objSender = new ObjectOutputStream(client.getOutputStream());
-		} catch (IOException e) {
-			Log.sendException(e);
-			throw e;
-		}
+		super(client);
 	}
 	
 	public void sendPCUser(User.LoginUser loginUser) throws IOException {
-		objSender.writeObject(loginUser);
+		sendAsObject(loginUser);
 	}
 	
 	public void send(Address cmd) throws IOException {
-		objSender.writeObject(cmd); 
+		sendAsObject(cmd); 
 	}
 	
 	public void send(Insurance cmd) throws IOException {
-		objSender.writeObject(cmd);
+		sendAsObject(cmd);
 	}
 	
 	public void send(InsuranceData cmd) throws IOException {
-		objSender.writeObject(cmd);
+		sendAsObject(cmd);
 	}
 	
 //	public void send(Invoice cmd) throws IOException {
-//	objSender.writeObject(cmd);
+//		sendAsObject(cmd);
 //	}
 	
 	public void send(Patient cmd) throws IOException {
-		objSender.writeObject(cmd);
+		sendAsObject(cmd);
 	}
 	
 //	public void send(Protocol cmd) throws IOException {
-//	objSender.writeObject(cmd);
+//		sendAsObject(cmd);
 //	}
 	
 	public void send(ServiceProvider cmd) throws IOException {
-		objSender.writeObject(cmd);
+		sendAsObject(cmd);
 	}
 	
 	public void send(TransportDetails cmd) throws IOException {
-		objSender.writeObject(cmd);
+		sendAsObject(cmd);
 	}
 	
 	public void send(TransportDocument cmd) throws IOException {
-		objSender.writeObject(cmd);
+		sendAsObject(cmd);
 	}
 	
 	public void send(User cmd) throws IOException {
-		objSender.writeObject(cmd);
+		sendAsObject(cmd);
 	}
 
 	public void send(Throwable e) throws IOException {
-		objSender.writeObject(e);
+		sendAsObject(e);
 	}
 	
-	public void send(List<?> list) throws IOException {
-		objSender.writeObject(list);
+	public void send(ArrayList<?> list) throws IOException {
+		sendAsObject(list);
+	}
+	
+	void setPublicKey(ComEncryptionKey publicKey) {
+		this.publicKey = publicKey;
 	}
 }
