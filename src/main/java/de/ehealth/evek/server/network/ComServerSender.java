@@ -12,9 +12,8 @@ import de.ehealth.evek.api.entity.ServiceProvider;
 import de.ehealth.evek.api.entity.TransportDetails;
 import de.ehealth.evek.api.entity.TransportDocument;
 import de.ehealth.evek.api.entity.User;
-import de.ehealth.evek.api.network.ComEncryptionKey;
-import de.ehealth.evek.api.network.interfaces.ComSender;
-import de.ehealth.evek.api.network.interfaces.IComServerSender;
+import de.ehealth.evek.api.network.ComSender;
+import de.ehealth.evek.api.network.IComServerSender;
 
 public class ComServerSender extends ComSender implements IComServerSender {
 	
@@ -72,9 +71,5 @@ public class ComServerSender extends ComSender implements IComServerSender {
 	
 	public void send(ArrayList<?> list) throws IOException {
 		sendAsObject(list);
-	}
-	
-	void setPublicKey(ComEncryptionKey publicKey) {
-		this.publicKey = publicKey;
 	}
 }
