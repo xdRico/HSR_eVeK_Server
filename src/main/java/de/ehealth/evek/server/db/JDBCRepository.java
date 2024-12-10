@@ -450,7 +450,7 @@ public class JDBCRepository implements IRepository {
 					 .VALUE("transportId", transportDetails.id().value().toString())
 					 .VALUE("transportDocument", transportDetails.transportDocument().id().value().toString())
 					 .VALUE("transportDate", transportDetails.transportDate())
-					 .VALUE("transportServiceProvider", transportDetails.transportProvider().id().value().toString());
+					 .VALUE("transportServiceProvider", transportDetails.transportProvider().get().id().value().toString());
 			
 			if(transportDetails.startAddress() != null 
 					&& transportDetails.startAddress().isPresent())
@@ -719,8 +719,7 @@ public class JDBCRepository implements IRepository {
 			UpdateBuilder ub = UPDATE("transportDetails")
 					 .WHERE("transportId", transportDetails.id().value().toString())
 					 .SET("transportDocument", transportDetails.transportDocument().id().value().toString())
-					 .SET("transportDate", transportDetails.transportDate())
-					 .SET("transportServiceProvider", transportDetails.transportProvider().id().value().toString());
+					 .SET("transportDate", transportDetails.transportDate());
 			
 			if(transportDetails.startAddress() != null 
 					&& transportDetails.startAddress().isPresent())
@@ -741,6 +740,10 @@ public class JDBCRepository implements IRepository {
 			if(transportDetails.tourNumber() != null 
 					&& transportDetails.tourNumber().isPresent())
 				ub.SET("tourNumber", transportDetails.tourNumber().get());
+			
+			if(transportDetails.transportProvider() != null 
+					&& transportDetails.transportProvider().isPresent())
+				 ub.SET("transportServiceProvider", transportDetails.transportProvider().get().id().value().toString());
 			
 			if(transportDetails.paymentExemption() != null 
 					&& transportDetails.paymentExemption().isPresent())
@@ -1174,6 +1177,7 @@ public class JDBCRepository implements IRepository {
 			COptional<Direction> direction = COptional.empty();
 			COptional<PatientCondition> patientCondition = COptional.empty();
 			COptional<String> tourNumber = COptional.empty();
+			COptional<Reference<ServiceProvider>> transportServiceProvider = COptional.empty();
 			COptional<Boolean> paymentExemption = COptional.empty();
 			COptional<String> patientSignature = COptional.empty();
 			COptional<Date> patientSignatureDate = COptional.empty();
@@ -1203,6 +1207,11 @@ public class JDBCRepository implements IRepository {
 					&& rs.getString("tourNumber") != "null" 
 					&& !rs.getString("tourNumber").equalsIgnoreCase("")) {
 				tourNumber = COptional.of(rs.getString("tourNumber"));
+			}
+			if(rs.getString("transportServiceProvider") != null 
+					&& rs.getString("transportServiceProvider") != "null"
+					&& !rs.getString("transportServiceProvider").equalsIgnoreCase("")) {
+				transportServiceProvider = COptional.of(Reference.to(rs.getString("transportServiceProvider")));
 			}
 			if(rs.getString("paymentExemption") != null 
 					&& rs.getString("paymentExemption") != "null" 
@@ -1236,7 +1245,7 @@ public class JDBCRepository implements IRepository {
 					endAddress,
 					direction,
 					patientCondition,
-					Reference.to(rs.getString("transportServiceProvider")),
+					transportServiceProvider,
 					tourNumber,
 					paymentExemption,
 					patientSignature,

@@ -646,8 +646,8 @@ public class TransportManagementService implements ITransportManagementService {
 		
 			case TransportDetails.Create create -> { 
 				
-				if(user.role() != SuperUser && user.serviceProvider() != create.transportProvider())
-					throw new UserNotAllowedException("User can't update Transport Details for another Service Provider!", user.id(), user.role());
+//				if(user.role() != SuperUser)
+//					throw new UserNotAllowedException("User can't update Transport Details for another Service Provider!", user.id(), user.role());
 
 				
 				var obj = new TransportDetails(repo.TransportDetailsID(), 
@@ -657,7 +657,7 @@ public class TransportManagementService implements ITransportManagementService {
 						COptional.empty(),
 						COptional.empty(),
 						COptional.empty(),
-						create.transportProvider(),
+						COptional.empty(),
 						COptional.empty(),
 						COptional.empty(),
 						COptional.empty(),
@@ -669,13 +669,28 @@ public class TransportManagementService implements ITransportManagementService {
 				
 				yield obj;
 			}
+			case TransportDetails.AssignTransportProvider update -> {
+				
+				var obj = repo.getTransportDetails(update.id())
+						.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Details ID"));
+						
+				if(obj.transportProvider().isPresent())
+					throw new IllegalArgumentException("Transport has already been assigned to " + obj.transportProvider().get().id().value() + "!");
+				
+				var updateObj  = obj.updateTransportProvider(update.transportProvider());
+				
+				repo.save(updateObj);
 			
+				yield updateObj;
+			}
 			case TransportDetails.Delete delete -> {
 				
 				var deleteObj = repo.getTransportDetails(delete.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Details ID"));
 				
-				if(user.role() != SuperUser && user.serviceProvider() != deleteObj.transportProvider())
+				if(user.role() != SuperUser 
+						&& deleteObj.transportProvider().isPresent()
+						&& user.serviceProvider() != deleteObj.transportProvider().get())
 					throw new UserNotAllowedException("User can't update Transport Details for another Service Provider!", user.id(), user.role());
 
 				
@@ -688,7 +703,9 @@ public class TransportManagementService implements ITransportManagementService {
 				var obj = repo.getTransportDetails(update.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Details ID"));
 						
-				if(user.role() != SuperUser && user.serviceProvider() != obj.transportProvider())
+				if(user.role() != SuperUser 
+						&& obj.transportProvider().isPresent()
+						&& user.serviceProvider() != obj.transportProvider().get())
 					throw new UserNotAllowedException("User can't update Transport Details for another Service Provider!", user.id(), user.role());
 
 				var updateObj  = obj.updateWith(update.startAddress(),
@@ -707,7 +724,9 @@ public class TransportManagementService implements ITransportManagementService {
 				var obj = repo.getTransportDetails(update.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Details ID"));
 				
-				if(user.role() != SuperUser && user.serviceProvider() != obj.transportProvider())
+				if(user.role() != SuperUser 
+						&& obj.transportProvider().isPresent()
+						&& user.serviceProvider() != obj.transportProvider().get())
 					throw new UserNotAllowedException("User can't update Transport Details for another Service Provider!", user.id(), user.role());
 
 				var updateObj = obj.updatePatientSignature(update.patientSignature(),
@@ -722,7 +741,9 @@ public class TransportManagementService implements ITransportManagementService {
 				var obj = repo.getTransportDetails(update.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Details ID"));
 				
-				if(user.role() != SuperUser && user.serviceProvider() != obj.transportProvider())
+				if(user.role() != SuperUser 
+						&& obj.transportProvider().isPresent()
+						&& user.serviceProvider() != obj.transportProvider().get())
 					throw new UserNotAllowedException("User can't update Transport Details for another Service Provider!", user.id(), user.role());
 
 				var updateObj  = obj.updatePatientSignature(update.transporterSignature(),

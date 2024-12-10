@@ -1,5 +1,6 @@
 package de.ehealth.evek.server.network;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -79,13 +80,15 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 					Log.sendMessage("Message could not be read!");
 			}
 		}catch (Throwable e) {
-			if(e.getMessage() != "Connection reset") {
+			if(e.getMessage() != "Connection reset" 
+					&& !(e instanceof EOFException)) {
 				Debug.sendException(e);
 				Log.sendMessage(String.format("	ReceiverThread[%s] has been stopped unexpected!", this.getName()));
+				isRunning = false;
 				return;
 			}
 		}
-		
+		isRunning = false;
 		Log.sendMessage(String.format("	ReceiverThread[%s] has been stopped due to lost Connection!", this.getName()));
 		return;
 	}
@@ -137,8 +140,7 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 		}catch(GetListThrowable t) {
 			sender.send(t.getArrayList());
 		}catch(Exception e) {
-			if(!(e instanceof IllegalArgumentException))
-				sender.send(e);
+			sender.send(e);
 			throw e;
 		}
 	}
@@ -150,8 +152,7 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 		}catch(GetListThrowable t) {
 			sender.send(t.getArrayList());
 		}catch(Exception e) {
-			if(!(e instanceof IllegalArgumentException))
-				sender.send(e);
+			sender.send(e);
 			throw e;
 		}	
 	}
@@ -163,8 +164,7 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 		}catch(GetListThrowable t) {
 			sender.send(t.getArrayList());
 		}catch(Exception e) {
-			if(!(e instanceof IllegalArgumentException))
-				sender.send(e);
+			sender.send(e);
 			throw e;
 		}
 	}
@@ -176,8 +176,7 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 		}catch(GetListThrowable t) {
 			sender.send(t.getArrayList());
 		}catch(Exception e) {
-			if(!(e instanceof IllegalArgumentException))
-				sender.send(e);
+			sender.send(e);
 			throw e;
 		}
 	}
@@ -189,8 +188,7 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 		}catch(GetListThrowable t) {
 			sender.send(t.getArrayList());
 		}catch(Exception e) {
-			if(!(e instanceof IllegalArgumentException))
-				sender.send(e);
+			sender.send(e);
 			throw e;
 		}
 	}
@@ -202,8 +200,7 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 		}catch(GetListThrowable t) {
 			sender.send(t.getArrayList());
 		}catch(Exception e) {
-			if(!(e instanceof IllegalArgumentException))
-				sender.send(e);
+			sender.send(e);
 			throw e;
 		}
 	}
@@ -215,8 +212,7 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 		}catch(GetListThrowable t) {
 			sender.send(t.getArrayList());
 		}catch(Exception e) {
-			if(!(e instanceof IllegalArgumentException))
-				sender.send(e);
+			sender.send(e);
 			throw e;
 		}
 	}
@@ -228,8 +224,7 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 		}catch(GetListThrowable t) {
 			sender.send(t.getArrayList());
 		}catch(Exception e) {
-			if(!(e instanceof IllegalArgumentException))
-				sender.send(e);
+			sender.send(e);
 			throw e;
 		}
 	}
