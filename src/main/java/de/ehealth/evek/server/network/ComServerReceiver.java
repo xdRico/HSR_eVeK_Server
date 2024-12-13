@@ -17,9 +17,11 @@ import de.ehealth.evek.api.entity.TransportDocument;
 import de.ehealth.evek.api.entity.User;
 import de.ehealth.evek.api.exception.EncryptionException;
 import de.ehealth.evek.api.exception.GetListThrowable;
+import de.ehealth.evek.api.exception.IllegalProcessException;
+import de.ehealth.evek.api.exception.ProcessingException;
 import de.ehealth.evek.api.exception.WrongCredentialsException;
-import de.ehealth.evek.api.network.ComEncryptionKey;
 import de.ehealth.evek.api.network.ComEncryption;
+import de.ehealth.evek.api.network.ComEncryptionKey;
 import de.ehealth.evek.api.network.IComServerReceiver;
 import de.ehealth.evek.api.network.IComServerSender;
 import de.ehealth.evek.api.type.Reference;
@@ -110,20 +112,25 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 			
 			return true;
 
-		} catch(WrongCredentialsException e) {
+		} catch(IllegalProcessException e) {
+			if(e.getCause() instanceof WrongCredentialsException)
+				Log.sendMessage("Credentials for user " + loginUser.userName() + " aren't correct!");
+			else {
+				Log.sendMessage();
+				Log.sendException(e);
+			}
 			try {
 				sender.send(e);
-				Log.sendMessage("Credentials for user " + loginUser.userName() + " aren't correct!");
 			}catch(Exception ex) {
 				Log.sendException(ex);
 			}
+			
 		} catch (Throwable e) {
 			Log.sendException(e);
 			try {
-				sender.send((User) null);
+				sender.send(new ProcessingException(e));
 			}catch(Exception ex) {
 				Log.sendException(ex);
-
 			}
 		}
 		return false;
@@ -134,103 +141,136 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 	}
 	
 	@Override
-	public void process(Address.Command cmd) throws Throwable {
-		try{
-			sender.send(transportManagementService.process(cmd, user));
-		}catch(GetListThrowable t) {
-			sender.send(t.getArrayList());
-		}catch(Exception e) {
-			sender.send(e);
-			throw e;
-		}
-	}
-
-	@Override
-	public void process(Insurance.Command cmd) throws Throwable{
-		try{
-			sender.send(transportManagementService.process(cmd, user));
-		}catch(GetListThrowable t) {
-			sender.send(t.getArrayList());
-		}catch(Exception e) {
-			sender.send(e);
-			throw e;
-		}	
-	}
-
-	@Override
-	public void process(InsuranceData.Command cmd) throws Throwable {
+	public void process(Address.Command cmd) throws ProcessingException, Exception {
 		try {
-			sender.send(transportManagementService.process(cmd, user));
-		}catch(GetListThrowable t) {
-			sender.send(t.getArrayList());
-		}catch(Exception e) {
-			sender.send(e);
-			throw e;
+			try{
+				sender.send(transportManagementService.process(cmd, user));
+			}catch(GetListThrowable t) {
+				sender.send(t.getArrayList());
+			}catch(Exception e) {
+				sender.send(e);
+				throw e;
+			}
+		}catch(IOException e) {
+			throw new ProcessingException(e);
 		}
 	}
 
 	@Override
-	public void process(Patient.Command cmd) throws Throwable {
+	public void process(Insurance.Command cmd) throws ProcessingException, Exception {
 		try{
-			sender.send(transportManagementService.process(cmd, user));
-		}catch(GetListThrowable t) {
-			sender.send(t.getArrayList());
-		}catch(Exception e) {
-			sender.send(e);
-			throw e;
+			try{
+				sender.send(transportManagementService.process(cmd, user));
+			}catch(GetListThrowable t) {
+				sender.send(t.getArrayList());
+			}catch(Exception e) {
+				sender.send(e);
+				throw e;
+			}
+		}catch(IOException e) {
+			throw new ProcessingException(e);
 		}
 	}
 
 	@Override
-	public void process(ServiceProvider.Command cmd) throws Throwable {
-		try {
-			sender.send(transportManagementService.process(cmd, user));
-		}catch(GetListThrowable t) {
-			sender.send(t.getArrayList());
-		}catch(Exception e) {
-			sender.send(e);
-			throw e;
-		}
-	}
-
-	@Override
-	public void process(TransportDetails.Command cmd) throws Throwable {
+	public void process(InsuranceData.Command cmd) throws ProcessingException, Exception {
 		try{
-			sender.send(transportManagementService.process(cmd, user));
-		}catch(GetListThrowable t) {
-			sender.send(t.getArrayList());
-		}catch(Exception e) {
-			sender.send(e);
-			throw e;
+			try{
+				sender.send(transportManagementService.process(cmd, user));
+			}catch(GetListThrowable t) {
+				sender.send(t.getArrayList());
+			}catch(Exception e) {
+				sender.send(e);
+				throw e;
+			}
+		}catch(IOException e) {
+			throw new ProcessingException(e);
 		}
 	}
 
 	@Override
-	public void process(TransportDocument.Command cmd) throws Throwable {
+	public void process(Patient.Command cmd) throws ProcessingException, Exception  {
 		try{
-			sender.send(transportManagementService.process(cmd, user));	
-		}catch(GetListThrowable t) {
-			sender.send(t.getArrayList());
-		}catch(Exception e) {
-			sender.send(e);
-			throw e;
+			try{
+				sender.send(transportManagementService.process(cmd, user));
+			}catch(GetListThrowable t) {
+				sender.send(t.getArrayList());
+			}catch(Exception e) {
+				sender.send(e);
+				throw e;
+			}
+		}catch(IOException e) {
+			throw new ProcessingException(e);
 		}
 	}
 
 	@Override
-	public void process(User.Command cmd) throws Throwable {
+	public void process(ServiceProvider.Command cmd) throws ProcessingException, Exception  {
 		try{
-			sender.send(transportManagementService.process(cmd, user));	
-		}catch(GetListThrowable t) {
-			sender.send(t.getArrayList());
-		}catch(Exception e) {
-			sender.send(e);
-			throw e;
+			try{
+				sender.send(transportManagementService.process(cmd, user));
+			}catch(GetListThrowable t) {
+				sender.send(t.getArrayList());
+			}catch(Exception e) {
+				sender.send(e);
+				throw e;
+			}
+		}catch(IOException e) {
+			throw new ProcessingException(e);
 		}
 	}
 
 	@Override
-	public void process(ComEncryptionKey key) throws Throwable {
+	public void process(TransportDetails.Command cmd) 
+			throws ProcessingException, Exception  {
+		try{
+			try{
+				sender.send(transportManagementService.process(cmd, user));
+			}catch(GetListThrowable t) {
+				sender.send(t.getArrayList());
+			}catch(Exception e) {
+				sender.send(e);
+				throw e;
+			}
+		}catch(IOException e) {
+			throw new ProcessingException(e);
+		}
+	}
+
+	@Override
+	public void process(TransportDocument.Command cmd) throws ProcessingException, Exception  {
+		try{
+			try{
+				sender.send(transportManagementService.process(cmd, user));
+			}catch(GetListThrowable t) {
+				sender.send(t.getArrayList());
+			}catch(Exception e) {
+				sender.send(e);
+				throw e;
+			}
+		}catch(IOException e) {
+			throw new ProcessingException(e);
+		}
+	}
+
+	@Override
+	public void process(User.Command cmd) throws ProcessingException, Exception  {
+		try{
+			try{
+				sender.send(transportManagementService.process(cmd, user));
+			}catch(GetListThrowable t) {
+				sender.send(t.getArrayList());
+			}catch(Exception e) {
+				sender.send(e);
+				throw e;
+			}
+		}catch(IOException e) {
+			throw new ProcessingException(e);
+		}
+	}
+
+	@Override
+	public void process(ComEncryptionKey key) throws EncryptionException {
 		try{ 
 			Log.sendMessage("Settung up Encryption for Client-Server-communication...");
 			if(encryption == null)
