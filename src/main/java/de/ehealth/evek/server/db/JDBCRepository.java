@@ -1340,12 +1340,14 @@ public class JDBCRepository implements IRepository {
 			}
 		}
 		
-		private String getPassword(Id<User> id) throws Exception {
+		private String getPassword(Id<User> id) throws WrongCredentialsException {
 			try (var stmt = conn.createStatement();
 					var rs = stmt.executeQuery(selectAllSQL("login", "user", id.value()))) {
-				if(!rs.isClosed())
+				if(!rs.isClosed()) {
 					if (rs.next()) 
 						return rs.getString("password");
+					else throw new WrongCredentialsException();
+				}
 				throw new RuntimeException();
 			}catch(SQLException e) {
 				throw new RuntimeException(e);
@@ -2125,14 +2127,11 @@ public class JDBCRepository implements IRepository {
 
 		@Override
 		public User loginCredentials(LoginUser login) throws WrongCredentialsException {
-			try {
-				User user = getUser(login.userName()).get();
-				if(!login.password().toString().equals(getPassword(user.id())))
-					throw new WrongCredentialsException();
-				return user;
-			} catch (Exception e) {
-				throw new WrongCredentialsException(e);
-			}
+			User user = getUser(login.userName()).orElseThrow(() -> new WrongCredentialsException());
+			if(!login.password().toString().equals(getPassword(user.id())))
+				throw new WrongCredentialsException();
+			return user;
+			
 		}
 		
 		@Override

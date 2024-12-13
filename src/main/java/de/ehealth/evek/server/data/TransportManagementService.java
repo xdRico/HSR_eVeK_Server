@@ -9,6 +9,7 @@ import de.ehealth.evek.api.exception.ProcessingException;
 import de.ehealth.evek.api.exception.UserNameAlreadyUsedException;
 import de.ehealth.evek.api.exception.UserNotAllowedException;
 import de.ehealth.evek.api.exception.UserNotFoundException;
+import de.ehealth.evek.api.exception.WrongCredentialsException;
 import de.ehealth.evek.api.type.Id;
 import de.ehealth.evek.api.type.Reference;
 import de.ehealth.evek.api.util.COptional;
@@ -1078,6 +1079,8 @@ public class TransportManagementService implements ITransportManagementService {
 					throw new GetListThrowable(repo.getUser(get.filter()));
 				}
 			};
+		} catch(WrongCredentialsException e) {
+			throw new IllegalProcessException(e);
 		} catch(UserNotAllowedException | IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
