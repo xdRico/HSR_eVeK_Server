@@ -104,7 +104,7 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 	}
 	
 	@Override
-	public boolean setProcessingUser(User.LoginUser loginUser) {
+	public boolean setProcessingUser(User.LoginUser loginUser) throws ProcessingException {
 		try {
 			User user = transportManagementService.process(loginUser, null);
 			this.user = Reference.to(user.id().value().toString());
@@ -116,7 +116,6 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 			if(e.getCause() instanceof WrongCredentialsException)
 				Log.sendMessage("Credentials for user " + loginUser.userName() + " aren't correct!");
 			else {
-				Log.sendMessage();
 				Log.sendException(e);
 			}
 			try {
@@ -125,15 +124,14 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 				Log.sendException(ex);
 			}
 			
-		} catch (Throwable e) {
+		} catch (GetListThrowable | IOException e) {
 			Log.sendException(e);
 			try {
 				sender.send(new ProcessingException(e));
 			}catch(Exception ex) {
 				Log.sendException(ex);
 			}
-		}
-		return false;
+		} return false;
 	}
 	
 	public boolean hasProcessingUser() {
@@ -141,13 +139,13 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 	}
 	
 	@Override
-	public void process(Address.Command cmd) throws ProcessingException, Exception {
+	public void process(Address.Command cmd) throws IllegalProcessException, ProcessingException {
 		try {
 			try{
 				sender.send(transportManagementService.process(cmd, user));
 			}catch(GetListThrowable t) {
 				sender.send(t.getArrayList());
-			}catch(Exception e) {
+			}catch(IllegalProcessException | ProcessingException e) {
 				sender.send(e);
 				throw e;
 			}
@@ -157,13 +155,13 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 	}
 
 	@Override
-	public void process(Insurance.Command cmd) throws ProcessingException, Exception {
+	public void process(Insurance.Command cmd) throws IllegalProcessException, ProcessingException {
 		try{
 			try{
 				sender.send(transportManagementService.process(cmd, user));
 			}catch(GetListThrowable t) {
 				sender.send(t.getArrayList());
-			}catch(Exception e) {
+			}catch(IllegalProcessException | ProcessingException e) {
 				sender.send(e);
 				throw e;
 			}
@@ -173,13 +171,13 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 	}
 
 	@Override
-	public void process(InsuranceData.Command cmd) throws ProcessingException, Exception {
+	public void process(InsuranceData.Command cmd) throws IllegalProcessException, ProcessingException {
 		try{
 			try{
 				sender.send(transportManagementService.process(cmd, user));
 			}catch(GetListThrowable t) {
 				sender.send(t.getArrayList());
-			}catch(Exception e) {
+			}catch(IllegalProcessException | ProcessingException e) {
 				sender.send(e);
 				throw e;
 			}
@@ -189,13 +187,13 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 	}
 
 	@Override
-	public void process(Patient.Command cmd) throws ProcessingException, Exception  {
+	public void process(Patient.Command cmd) throws IllegalProcessException, ProcessingException {
 		try{
 			try{
 				sender.send(transportManagementService.process(cmd, user));
 			}catch(GetListThrowable t) {
 				sender.send(t.getArrayList());
-			}catch(Exception e) {
+			}catch(IllegalProcessException | ProcessingException e) {
 				sender.send(e);
 				throw e;
 			}
@@ -205,13 +203,13 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 	}
 
 	@Override
-	public void process(ServiceProvider.Command cmd) throws ProcessingException, Exception  {
+	public void process(ServiceProvider.Command cmd) throws IllegalProcessException, ProcessingException {
 		try{
 			try{
 				sender.send(transportManagementService.process(cmd, user));
 			}catch(GetListThrowable t) {
 				sender.send(t.getArrayList());
-			}catch(Exception e) {
+			}catch(IllegalProcessException | ProcessingException e) {
 				sender.send(e);
 				throw e;
 			}
@@ -221,14 +219,13 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 	}
 
 	@Override
-	public void process(TransportDetails.Command cmd) 
-			throws ProcessingException, Exception  {
+	public void process(TransportDetails.Command cmd) throws IllegalProcessException, ProcessingException {
 		try{
 			try{
 				sender.send(transportManagementService.process(cmd, user));
 			}catch(GetListThrowable t) {
 				sender.send(t.getArrayList());
-			}catch(Exception e) {
+			}catch(IllegalProcessException | ProcessingException e) {
 				sender.send(e);
 				throw e;
 			}
@@ -238,13 +235,13 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 	}
 
 	@Override
-	public void process(TransportDocument.Command cmd) throws ProcessingException, Exception  {
+	public void process(TransportDocument.Command cmd) throws IllegalProcessException, ProcessingException {
 		try{
 			try{
 				sender.send(transportManagementService.process(cmd, user));
 			}catch(GetListThrowable t) {
 				sender.send(t.getArrayList());
-			}catch(Exception e) {
+			}catch(IllegalProcessException | ProcessingException e) {
 				sender.send(e);
 				throw e;
 			}
@@ -254,13 +251,13 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 	}
 
 	@Override
-	public void process(User.Command cmd) throws ProcessingException, Exception  {
+	public void process(User.Command cmd) throws IllegalProcessException, ProcessingException {
 		try{
 			try{
 				sender.send(transportManagementService.process(cmd, user));
 			}catch(GetListThrowable t) {
 				sender.send(t.getArrayList());
-			}catch(Exception e) {
+			}catch(IllegalProcessException | ProcessingException e) {
 				sender.send(e);
 				throw e;
 			}
