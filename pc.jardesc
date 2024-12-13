@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <jardesc>
-    <jar path="A:/Programmieren/workspace/Git/e-VeK/Server_v0.1.1.jar"/>
+    <jar path="HSR_eVeK_Server/build/Server_v0.1.4.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/HSR_eVeK_Server/pc.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="true" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
@@ -16,6 +16,7 @@
         <file path="/HSR_eVeK_Server/.gitignore"/>
         <file path="/HSR_eVeK_Server/.project"/>
         <file path="/HSR_eVeK_Server/Database.uxf"/>
+        <file path="/HSR_eVeK_Server/LICENSE"/>
         <file path="/HSR_eVeK_Server/Server.uxf"/>
         <file path="/HSR_eVeK_Server/jardesc.jardesc"/>
         <file path="/HSR_eVeK_Server/pc.jardesc"/>
