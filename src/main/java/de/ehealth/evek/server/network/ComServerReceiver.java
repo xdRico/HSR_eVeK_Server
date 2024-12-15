@@ -77,9 +77,18 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 		Object readObj;
 		try {
 			while(isRunning && objReader != null && (readObj = objReader.readObject()) != null) {
-				Log.sendMessage(String.valueOf(readObj));
-				if(!receiveObject(readObj))
+				try {
+					Log.sendMessage(String.valueOf(readObj));
+					if(!receiveObject(readObj))
+						Log.sendMessage("Message could not be read!");
+				} catch(Throwable t) {
 					Log.sendMessage("Message could not be read!");
+					Log.sendException(t);
+					if(t instanceof RuntimeException) {
+						sender.sendAsObject(t);
+						throw t;
+					}
+				}
 			}
 		}catch (Throwable e) {
 			if(e.getMessage() != "Connection reset" 
