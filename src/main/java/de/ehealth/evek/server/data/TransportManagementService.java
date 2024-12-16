@@ -68,6 +68,8 @@ public class TransportManagementService implements ITransportManagementService {
 		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
+		}catch(IllegalProcessException e) {
+			throw e;
 		} catch(Exception e) {
 			Log.sendException(e);
 			throw new ProcessingException(e);
@@ -138,6 +140,8 @@ public class TransportManagementService implements ITransportManagementService {
 		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
+		}catch(IllegalProcessException e) {
+			throw e;
 		} catch(Exception e) {
 			Log.sendException(e);
 			throw new ProcessingException(e);
@@ -216,6 +220,8 @@ public class TransportManagementService implements ITransportManagementService {
 		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
+		}catch(IllegalProcessException e) {
+			throw e;
 		} catch(Exception e) {
 			Log.sendException(e);
 			throw new ProcessingException(e);
@@ -257,6 +263,8 @@ public class TransportManagementService implements ITransportManagementService {
 		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
+		}catch(IllegalProcessException e) {
+			throw e;
 		} catch(Exception e) {
 			Log.sendException(e);
 			throw new ProcessingException(e);
@@ -440,6 +448,8 @@ public class TransportManagementService implements ITransportManagementService {
 		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
+		}catch(IllegalProcessException e) {
+			throw e;
 		} catch(Exception e) {
 			Log.sendException(e);
 			throw new ProcessingException(e);
@@ -614,6 +624,8 @@ public class TransportManagementService implements ITransportManagementService {
 		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
+		}catch(IllegalProcessException e) {
+			throw e;
 		} catch(Exception e) {
 			Log.sendException(e);
 			throw new ProcessingException(e);
@@ -750,6 +762,8 @@ public class TransportManagementService implements ITransportManagementService {
 		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
+		}catch(IllegalProcessException e) {
+			throw e;
 		} catch(Exception e) {
 			Log.sendException(e);
 			throw new ProcessingException(e);
@@ -856,6 +870,8 @@ public class TransportManagementService implements ITransportManagementService {
 		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
+		}catch(IllegalProcessException e) {
+			throw e;
 		} catch(Exception e) {
 			Log.sendException(e);
 			throw new ProcessingException(e);
@@ -994,6 +1010,8 @@ public class TransportManagementService implements ITransportManagementService {
 		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
+		}catch(IllegalProcessException e) {
+			throw e;
 		} catch(Exception e) {
 			Log.sendException(e);
 			throw new ProcessingException(e);

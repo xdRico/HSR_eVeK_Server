@@ -122,8 +122,8 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 			return true;
 
 		} catch(IllegalProcessException e) {
-			if(e.getCause() instanceof WrongCredentialsException)
-				Log.sendMessage("Credentials for user " + loginUser.userName() + " aren't correct!");
+			if(e instanceof WrongCredentialsException)
+				Log.sendMessage("Credentials for user " + loginUser.userName() + " are not correct!");
 			else {
 				Log.sendException(e);
 			}
