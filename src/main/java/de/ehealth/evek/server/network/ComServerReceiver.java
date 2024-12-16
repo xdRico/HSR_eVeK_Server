@@ -278,22 +278,28 @@ public final class ComServerReceiver extends Thread implements IComServerReceive
 	@Override
 	public void process(ComEncryptionKey key) throws EncryptionException {
 		try{ 
-			Log.sendMessage("Settung up Encryption for Client-Server-communication...");
+			Log.sendMessage("Setting up Encryption for Client-Server-communication...");
 			if(encryption == null)
 				encryption = new ComEncryption(this, sender);
 			encryption.useEncryption(key);
 		
 			Log.sendMessage("	Encryption for Client-Server-communication has been successfully set up!");
 
-		}catch(EncryptionException e) {
+		}catch(IllegalProcessException e) {
 			Log.sendException(e);
+			throw new EncryptionException(e);
 		}		
 	}
 
 	@Override
 	public Serializable handleInputEncryption(Serializable inputObject) throws EncryptionException {
-		if(encryption == null)
-			encryption = new ComEncryption(this, sender);
-		return encryption.getObject(inputObject); 
+		try {
+			if(encryption == null)
+				encryption = new ComEncryption(this, sender);
+			return encryption.getObject(inputObject); 
+		}catch(IllegalProcessException e) {
+			Log.sendException(e);
+			throw new EncryptionException(e);
+		}	
 	}
 }

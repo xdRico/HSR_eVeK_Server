@@ -1,21 +1,33 @@
 package de.ehealth.evek.server.data;
 
-import java.util.List;
+import static de.ehealth.evek.api.type.UserRole.HealthcareAdmin;
+import static de.ehealth.evek.api.type.UserRole.HealthcareDoctor;
+import static de.ehealth.evek.api.type.UserRole.HealthcareUser;
+import static de.ehealth.evek.api.type.UserRole.InsuranceAdmin;
+import static de.ehealth.evek.api.type.UserRole.InsuranceUser;
+import static de.ehealth.evek.api.type.UserRole.SuperUser;
+import static de.ehealth.evek.api.type.UserRole.TransportAdmin;
+import static de.ehealth.evek.api.type.UserRole.TransportDoctor;
+import static de.ehealth.evek.api.type.UserRole.TransportInvoice;
+import static de.ehealth.evek.api.type.UserRole.TransportUser;
 
-import de.ehealth.evek.api.entity.*;
+import de.ehealth.evek.api.entity.Address;
+import de.ehealth.evek.api.entity.Insurance;
+import de.ehealth.evek.api.entity.InsuranceData;
+import de.ehealth.evek.api.entity.Patient;
+import de.ehealth.evek.api.entity.ServiceProvider;
+import de.ehealth.evek.api.entity.TransportDetails;
+import de.ehealth.evek.api.entity.TransportDocument;
+import de.ehealth.evek.api.entity.User;
 import de.ehealth.evek.api.exception.GetListThrowable;
 import de.ehealth.evek.api.exception.IllegalProcessException;
 import de.ehealth.evek.api.exception.ProcessingException;
 import de.ehealth.evek.api.exception.UserNameAlreadyUsedException;
 import de.ehealth.evek.api.exception.UserNotAllowedException;
 import de.ehealth.evek.api.exception.UserNotFoundException;
-import de.ehealth.evek.api.exception.WrongCredentialsException;
-import de.ehealth.evek.api.type.Id;
 import de.ehealth.evek.api.type.Reference;
 import de.ehealth.evek.api.util.COptional;
 import de.ehealth.evek.api.util.Log;
-
-import static de.ehealth.evek.api.type.UserRole.*;
 
 
 public class TransportManagementService implements ITransportManagementService {
@@ -53,7 +65,7 @@ public class TransportManagementService implements ITransportManagementService {
 			repo.save(objCreate);
 			
 			return objCreate;
-		} catch(UserNotAllowedException | IllegalArgumentException e) {
+		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
 		} catch(Exception e) {
@@ -123,7 +135,7 @@ public class TransportManagementService implements ITransportManagementService {
 					throw new GetListThrowable(repo.getAddress(get.filter()));
 				}
 			};
-		} catch(UserNotAllowedException | IllegalArgumentException e) {
+		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
 		} catch(Exception e) {
@@ -131,25 +143,12 @@ public class TransportManagementService implements ITransportManagementService {
 			throw new ProcessingException(e);
 		}
 	}
-
-	
-	@Override
-	public List<Address> getAddress(Address.Filter filter) {	
-		return repo.getAddress(filter);
-	}
-
-	@Override
-	public Address getAddress(Id<Address> id) {
-		Address obj = null;
-		obj = repo.getAddress(id).orElseThrow(() -> new IllegalArgumentException("Invalid Address ID")); 
-		return obj;
-	}
 	
 	@Override
 	public Insurance process(Insurance.Command cmd, Reference<User> processingUser) throws IllegalProcessException, ProcessingException, GetListThrowable {
 		try {
 			User user = repo.getUser(processingUser.id())
-					.orElseThrow(() -> new UserNotFoundException("Processing user not found! - was the user deleted?", processingUser.id()));
+					.orElseThrow(() -> new UserNotFoundException(processingUser.id(), "Processing user not found! - was the user deleted?"));
 			if(!user.role().getAllowedActions().contains(cmd.getClass()))
 				throw new UserNotAllowedException(user.id(), user.role());
 			
@@ -214,7 +213,7 @@ public class TransportManagementService implements ITransportManagementService {
 					throw new GetListThrowable(repo.getInsurance(get.filter()));
 				}
 			};
-		} catch(UserNotAllowedException | IllegalArgumentException e) {
+		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
 		} catch(Exception e) {
@@ -223,24 +222,11 @@ public class TransportManagementService implements ITransportManagementService {
 		}
 	}
 
-
-	@Override
-	public List<Insurance> getInsurance(Insurance.Filter filter) {	
-		return repo.getInsurance(filter);
-	}
-
-	@Override
-	public Insurance getInsurance(Id<Insurance> id) {
-		Insurance obj = null;
-		obj = repo.getInsurance(id).orElseThrow(() -> new IllegalArgumentException("Invalid Insurance ID")); 
-		return obj;
-	}
-	
 	@Override
 	public InsuranceData process(InsuranceData.Command cmd, Reference<User> processingUser) throws IllegalProcessException, ProcessingException, GetListThrowable {
 		try {
 			User user = repo.getUser(processingUser.id())
-					.orElseThrow(() -> new UserNotFoundException("Processing user not found! - was the user deleted?", processingUser.id()));
+					.orElseThrow(() -> new UserNotFoundException(processingUser.id(), "Processing user not found! - was the user deleted?"));
 			if(!user.role().getAllowedActions().contains(cmd.getClass()))
 				throw new UserNotAllowedException(user.id(), user.role());
 			
@@ -268,25 +254,13 @@ public class TransportManagementService implements ITransportManagementService {
 					throw new GetListThrowable(repo.getInsuranceData(get.filter()));
 				}
 			};
-		} catch(UserNotAllowedException | IllegalArgumentException e) {
+		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
 		} catch(Exception e) {
 			Log.sendException(e);
 			throw new ProcessingException(e);
 		}
-	}
-
-	@Override
-	public List<InsuranceData> getInsuranceData(InsuranceData.Filter filter) {	
-		return repo.getInsuranceData(filter);
-	}
-
-	@Override
-	public InsuranceData getInsuranceData(Id<InsuranceData> id) {
-		InsuranceData obj = null;
-		obj = repo.getInsuranceData(id).orElseThrow(() -> new IllegalArgumentException("Invalid Insurance Data ID")); 
-		return obj;
 	}
 	
 //	@Override
@@ -336,24 +310,12 @@ public class TransportManagementService implements ITransportManagementService {
 //		};
 //	}
 //
-//
-//	@Override
-//	public List<Invoice> getInvoice(Invoice.Filter filter) {	
-//		return repo.getInvoice(filter);
-//	}
-//
-//	@Override
-//	public Invoice getInvoice(Id<Invoice> id) {
-//		Invoice obj = null;
-//		obj = repo.getInvoice(id).orElseThrow(() -> new IllegalArgumentException("Invalid Invoice ID")); 
-//		return obj;
-//	}
 	
 	@Override
 	public Patient process(Patient.Command cmd, Reference<User> processingUser) throws IllegalProcessException, ProcessingException, GetListThrowable {
 		try {
 			User user = repo.getUser(processingUser.id())
-					.orElseThrow(() -> new UserNotFoundException("Processing user not found! - was the user deleted?", processingUser.id()));
+					.orElseThrow(() -> new UserNotFoundException(processingUser.id(), "Processing user not found! - was the user deleted?"));
 			if(!user.role().getAllowedActions().contains(cmd.getClass()))
 				throw new UserNotAllowedException(user.id(), user.role());
 			
@@ -428,8 +390,7 @@ public class TransportManagementService implements ITransportManagementService {
 						
 					var updateObj = obj.updateWith(
 									update.lastName(),
-									update.firstName(),
-									update.address());
+									update.firstName());
 					
 					repo.save(updateObj);
 				
@@ -476,25 +437,13 @@ public class TransportManagementService implements ITransportManagementService {
 					throw new GetListThrowable(repo.getPatient(get.filter()));
 				}
 			};
-		} catch(UserNotAllowedException | IllegalArgumentException e) {
+		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
 		} catch(Exception e) {
 			Log.sendException(e);
 			throw new ProcessingException(e);
 		}
-	}
-
-	@Override
-	public List<Patient> getPatient(Patient.Filter filter) {	
-		return repo.getPatient(filter);
-	}
-
-	@Override
-	public Patient getPatient(Id<Patient> id) {
-		Patient obj = null;
-		obj = repo.getPatient(id).orElseThrow(() -> new IllegalArgumentException("Invalid Patient ID")); 
-		return obj;
 	}
 	
 //	@Override
@@ -554,7 +503,7 @@ public class TransportManagementService implements ITransportManagementService {
 			User user;
 			if(!(!repo.hasUsers() && processingUser == null)) {
 				user = repo.getUser(processingUser.id())
-						.orElseThrow(() -> new UserNotFoundException("Processing user not found! - was the user deleted?", processingUser.id()));
+						.orElseThrow(() -> new UserNotFoundException(processingUser.id(), "Processing user not found! - was the user deleted?"));
 				if(!user.role().getAllowedActions().contains(cmd.getClass()))
 					throw new UserNotAllowedException(user.id(), user.role());
 			}else user = new User(null, null, null, null, null, SuperUser);
@@ -662,7 +611,7 @@ public class TransportManagementService implements ITransportManagementService {
 					throw new GetListThrowable(repo.getServiceProvider(get.filter()));
 				}
 			};
-		} catch(UserNotAllowedException | IllegalArgumentException e) {
+		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
 		} catch(Exception e) {
@@ -672,29 +621,17 @@ public class TransportManagementService implements ITransportManagementService {
 	}
 	
 	@Override
-	public List<ServiceProvider> getServiceProvider(ServiceProvider.Filter filter) {	
-		return repo.getServiceProvider(filter);
-	}
-
-	@Override
-	public ServiceProvider getServiceProvider(Id<ServiceProvider> id) {
-		ServiceProvider obj = null;
-		obj = repo.getServiceProvider(id).orElseThrow(() -> new IllegalArgumentException("Invalid Service Provider ID")); 
-		return obj;
-	}
-	
-	@Override
 	public TransportDetails process(TransportDetails.Command cmd, Reference<User> processingUser) throws IllegalProcessException, ProcessingException, GetListThrowable {
 		try {
 			User user = repo.getUser(processingUser.id())
-					.orElseThrow(() -> new UserNotFoundException("Processing user not found! - was the user deleted?", processingUser.id()));
+					.orElseThrow(() -> new UserNotFoundException(processingUser.id(), "Processing user not found! - was the user deleted?"));
 			if(!user.role().getAllowedActions().contains(cmd.getClass()))
 				throw new UserNotAllowedException(user.id(), user.role());
 			
 			return switch(cmd){
 			
 				case TransportDetails.Create create -> { 
-					
+					//TODO
 	//				if(user.role() != SuperUser)
 	//					throw new UserNotAllowedException("User can't update Transport Details for another Service Provider!", user.id(), user.role());
 	
@@ -810,7 +747,7 @@ public class TransportManagementService implements ITransportManagementService {
 					throw new GetListThrowable(repo.getTransportDetails(get.filter()));
 				}
 			};
-		} catch(UserNotAllowedException | IllegalArgumentException e) {
+		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
 		} catch(Exception e) {
@@ -819,24 +756,11 @@ public class TransportManagementService implements ITransportManagementService {
 		}
 	}
 
-
-	@Override
-	public List<TransportDetails> getTransportDetails(TransportDetails.Filter filter) {	
-		return repo.getTransportDetails(filter);
-	}
-
-	@Override
-	public TransportDetails getTransportDetails(Id<TransportDetails> id) {
-		TransportDetails obj = null;
-		obj = repo.getTransportDetails(id).orElseThrow(() -> new IllegalArgumentException("Invalid Transport Details ID")); 
-		return obj;
-	}
-	
 	@Override
 	public TransportDocument process(TransportDocument.Command cmd, Reference<User> processingUser) throws IllegalProcessException, ProcessingException, GetListThrowable {
 		try {
 			User user = repo.getUser(processingUser.id())
-					.orElseThrow(() -> new UserNotFoundException("Processing user not found! - was the user deleted?", processingUser.id()));
+					.orElseThrow(() -> new UserNotFoundException(processingUser.id(), "Processing user not found! - was the user deleted?"));
 			if(!user.role().getAllowedActions().contains(cmd.getClass()))
 				throw new UserNotAllowedException(user.id(), user.role());
 			
@@ -929,25 +853,13 @@ public class TransportManagementService implements ITransportManagementService {
 					.orElseThrow(() -> new IllegalArgumentException("Invalid Address ID")).archive();
 				}
 			};
-		} catch(UserNotAllowedException | IllegalArgumentException e) {
+		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
 		} catch(Exception e) {
 			Log.sendException(e);
 			throw new ProcessingException(e);
 		}
-	}
-
-	@Override
-	public List<TransportDocument> getTransportDocument(TransportDocument.Filter filter) {	
-		return repo.getTransportDocument(filter);
-	}
-
-	@Override
-	public TransportDocument getTransportDocument(Id<TransportDocument> id) {
-		TransportDocument obj = null;
-		obj = repo.getTransportDocument(id).orElseThrow(() -> new IllegalArgumentException("Invalid Transport Document ID")); 
-		return obj;
 	}
 	
 	@Override
@@ -959,7 +871,7 @@ public class TransportManagementService implements ITransportManagementService {
 							|| (cmd instanceof User.CreateFull
 									&&  !repo.hasUsers())))) {
 				user = repo.getUser(processingUser.id())
-						.orElseThrow(() -> new UserNotFoundException("Processing user not found! - was the user deleted?", processingUser.id()));
+						.orElseThrow(() -> new UserNotFoundException(processingUser.id(), "Processing user not found! - was the user deleted?"));
 				if(!user.role().getAllowedActions().contains(cmd.getClass()))
 					throw new UserNotAllowedException(user.id(), user.role());
 			}else if(!repo.hasUsers() 
@@ -1079,9 +991,7 @@ public class TransportManagementService implements ITransportManagementService {
 					throw new GetListThrowable(repo.getUser(get.filter()));
 				}
 			};
-		} catch(WrongCredentialsException e) {
-			throw new IllegalProcessException(e);
-		} catch(UserNotAllowedException | IllegalArgumentException e) {
+		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
 		} catch(Exception e) {
@@ -1089,17 +999,4 @@ public class TransportManagementService implements ITransportManagementService {
 			throw new ProcessingException(e);
 		}
 	}
-
-	@Override
-	public List<User> getUser(User.Filter filter) {	
-		return repo.getUser(filter);
-	}
-
-	@Override
-	public User getUser(Id<User> id) {
-		User obj = null;
-		obj = repo.getUser(id).orElseThrow(() -> new IllegalArgumentException("Invalid User ID")); 
-		return obj;
-	}
-	
 }

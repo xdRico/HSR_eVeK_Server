@@ -180,7 +180,7 @@ public class JDBCRepository implements IRepository {
 					"endAddress" UUID references "address"("addressId"),
 					"direction" VARCHAR(15),
 					"patientCondition" VARCHAR(15),
-					"transportServiceProvider" VARCHAR(9) NOT NULL REFERENCES "serviceProvider"("serviceProviderId"),
+					"transportServiceProvider" VARCHAR(9) REFERENCES "serviceProvider"("serviceProviderId"),
 					"tourNumber" VARCHAR(255),
 					"paymentExemption" BOOLEAN,
 					"patientSignature" VARCHAR(255),
@@ -449,8 +449,7 @@ public class JDBCRepository implements IRepository {
 			InsertBuilder ib = INSERT_INTO("transportDetails")
 					 .VALUE("transportId", transportDetails.id().value().toString())
 					 .VALUE("transportDocument", transportDetails.transportDocument().id().value().toString())
-					 .VALUE("transportDate", transportDetails.transportDate())
-					 .VALUE("transportServiceProvider", transportDetails.transportProvider().get().id().value().toString());
+					 .VALUE("transportDate", transportDetails.transportDate());
 			
 			if(transportDetails.startAddress() != null 
 					&& transportDetails.startAddress().isPresent())
@@ -472,6 +471,10 @@ public class JDBCRepository implements IRepository {
 					&& transportDetails.tourNumber().isPresent())
 				ib.VALUE("tourNumber", transportDetails.tourNumber().get());
 			
+			if(transportDetails.transportProvider() != null
+					&& transportDetails.transportProvider().isPresent())
+				ib.VALUE("transportServiceProvider", transportDetails.transportProvider().get().id().value().toString());
+
 			if(transportDetails.paymentExemption() != null 
 					&& transportDetails.paymentExemption().isPresent())
 				ib.VALUE("paymentExemption", transportDetails.paymentExemption().get());
