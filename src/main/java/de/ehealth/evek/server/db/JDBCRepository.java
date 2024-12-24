@@ -568,7 +568,7 @@ public class JDBCRepository implements IRepository {
 		 */
 		private static String insertSQL(LoginUser login) {
 			 return INSERT_INTO("login")
-					 .VALUE("user", login.userName())
+					 .VALUE("user", login.userName().toLowerCase())
 					 .VALUE("password", login.password())
 					 .toString();
 		}

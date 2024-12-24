@@ -53,8 +53,8 @@ public class TransportManagementService implements ITransportManagementService {
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Insurance Data ID"));
 			
 				if(user.role() != SuperUser 
-						&& user.serviceProvider().id().value().toString() != create.insurance().id().value().toString()
-						&& objIns.insurance().id().value().toString() != create.insurance().id().value().toString())
+						&& !user.serviceProvider().id().value().equalsIgnoreCase(create.insurance().id().value())
+						&& !objIns.insurance().id().value().equals(create.insurance().id().value()))
 					throw new UserNotAllowedException("User can't create Patients for another Insurance!", user.id(), user.role());
 			}
 			var objCreate = new InsuranceData(repo.InsuranceDataID(), 
@@ -171,7 +171,8 @@ public class TransportManagementService implements ITransportManagementService {
 				
 				case Insurance.Delete delete -> {
 					
-					if(user.role() != SuperUser && user.serviceProvider().id().value().toString() != delete.id().value().toString())
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(delete.id().value()))
 						throw new UserNotAllowedException("User can't create Patients for another Insurance!", user.id(), user.role());
 					
 					var deleteObj = repo.getInsurance(delete.id())
@@ -184,7 +185,8 @@ public class TransportManagementService implements ITransportManagementService {
 				
 				case Insurance.Update update -> {
 					
-					if(user.role() != SuperUser && user.serviceProvider().id().value().toString() != update.id().value().toString())
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(update.id().value()))
 						throw new UserNotAllowedException("User can't create Patients for another Insurance!", user.id(), user.role());
 					
 					
@@ -198,7 +200,8 @@ public class TransportManagementService implements ITransportManagementService {
 				}
 				case Insurance.Move move -> {
 					
-					if(user.role() != SuperUser && user.serviceProvider().id().value().toString() != move.id().value().toString())
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(move.id().value()))
 						throw new UserNotAllowedException("User can't create Patients for another Insurance!", user.id(), user.role());
 					
 					var updateObj  = repo.getInsurance(move.id())
@@ -334,7 +337,8 @@ public class TransportManagementService implements ITransportManagementService {
 					var objIns = repo.getInsuranceData(create.insuranceData().id())
 							.orElseThrow(() -> new IllegalArgumentException("Invalid Insurance Data ID"));
 					
-					if(user.role() != SuperUser && user.serviceProvider().id().value().toString() != objIns.insurance().id().value().toString())
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(objIns.insurance().id().value()))
 						throw new UserNotAllowedException("User can't create Patients for another Insurance!", user.id(), user.role());
 						
 					
@@ -352,7 +356,8 @@ public class TransportManagementService implements ITransportManagementService {
 				
 				case Patient.CreateWithInsuranceData create -> { 
 					
-					if(user.role() != SuperUser && user.serviceProvider().id().value().toString() != create.insurance().id().value().toString())
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(create.insurance().id().value()))
 						throw new UserNotAllowedException("User can't create Patients for another Insurance!", user.id(), user.role());
 					InsuranceData insuranceData = process(
 							new InsuranceData.Create(Reference.to(create.insuranceNumber()), create.insurance(), create.insuranceStatus()), 
@@ -377,7 +382,8 @@ public class TransportManagementService implements ITransportManagementService {
 					var objIns = repo.getInsuranceData(deleteObj.insuranceData().id())
 							.orElseThrow(() -> new IllegalArgumentException("Invalid Insurance Data ID"));
 					
-					if(user.role() != SuperUser && user.serviceProvider().id().value().toString() != objIns.insurance().id().value().toString())
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(objIns.insurance().id().value()))
 						throw new UserNotAllowedException("User can't delete Patients of another Insurance!", user.id(), user.role());
 						
 					
@@ -393,7 +399,8 @@ public class TransportManagementService implements ITransportManagementService {
 					var objIns = repo.getInsuranceData(obj.insuranceData().id())
 							.orElseThrow(() -> new IllegalArgumentException("Invalid Insurance Data ID"));
 					
-					if(user.role() != SuperUser && user.serviceProvider().id().value().toString() != objIns.insurance().id().value().toString())
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(objIns.insurance().id().value()))
 						throw new UserNotAllowedException("User can't update Patients of another Insurance!", user.id(), user.role());
 						
 					var updateObj = obj.updateWith(
@@ -410,8 +417,8 @@ public class TransportManagementService implements ITransportManagementService {
 					var objIns = repo.getInsuranceData(obj.insuranceData().id())
 							.orElseThrow(() -> new IllegalArgumentException("Invalid Insurance Data ID"));
 					
-					if(user.role() != SuperUser && user.serviceProvider().id().value().toString().equals(
-							objIns.insurance().id().value().toString()))
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(objIns.insurance().id().value()))
 						throw new UserNotAllowedException("User can't update Patients of another Insurance!", user.id(), user.role());
 							
 					var updateObj = obj.updateInsuranceData(Reference.to(update.insuranceData().id().value().toString()));
@@ -427,8 +434,8 @@ public class TransportManagementService implements ITransportManagementService {
 					var objIns = repo.getInsuranceData(obj.insuranceData().id())
 							.orElseThrow(() -> new IllegalArgumentException("Invalid Insurance Data ID"));
 					
-					if(user.role() != SuperUser && user.serviceProvider().id().value().toString().equals(
-							objIns.insurance().id().value().toString()))
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(objIns.insurance().id().value()))
 						throw new UserNotAllowedException("User can't update Patients of another Insurance!", user.id(), user.role());
 							
 					var updateObj = obj.updateAddress(move.address());
@@ -560,7 +567,8 @@ public class TransportManagementService implements ITransportManagementService {
 					var deleteObj = repo.getServiceProvider(delete.id())
 							.orElseThrow(() -> new IllegalArgumentException("Invalid Service Provider ID"));
 					
-					if(user.role() != SuperUser && user.serviceProvider().id() != delete.id())
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(delete.id().value()))
 						throw new UserNotAllowedException("User can't delete another Service Provider!", user.id(), user.role());
 	
 					
@@ -574,7 +582,8 @@ public class TransportManagementService implements ITransportManagementService {
 					var obj = repo.getServiceProvider(update.id())
 							.orElseThrow(() -> new IllegalArgumentException("Invalid Service Provider ID"));
 					
-					if(user.role() != SuperUser && user.serviceProvider().id() != obj.id())
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(obj.id().value()))
 						throw new UserNotAllowedException("User can't update another Service Provider!", user.id(), user.role());
 	
 					var updateObj = obj.updateWith(update.name(),
@@ -589,7 +598,8 @@ public class TransportManagementService implements ITransportManagementService {
 					var obj = repo.getServiceProvider(move.id())
 							.orElseThrow(() -> new IllegalArgumentException("Invalid Service Provider ID"));
 							
-					if(user.role() != SuperUser && user.serviceProvider().id() != obj.id())
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(obj.id().value()))
 						throw new UserNotAllowedException("User can't update another Service Provider!", user.id(), user.role());
 	
 							
@@ -603,7 +613,8 @@ public class TransportManagementService implements ITransportManagementService {
 					var obj = repo.getServiceProvider(update.id())
 							.orElseThrow(() -> new IllegalArgumentException("Invalid Service Provider ID"));
 					
-					if(user.role() != SuperUser && user.serviceProvider().id() != obj.id())
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(obj.id().value()))
 						throw new UserNotAllowedException("User can't update another Service Provider!", user.id(), user.role());
 	
 					var updateObj = obj.updateWith(update.providesHealthcare(),
@@ -688,7 +699,7 @@ public class TransportManagementService implements ITransportManagementService {
 					
 					if(user.role() != SuperUser 
 							&& deleteObj.transportProvider().isPresent()
-							&& user.serviceProvider() != deleteObj.transportProvider().get())
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(deleteObj.transportProvider().get().id().value()))
 						throw new UserNotAllowedException("User can't update Transport Details for another Service Provider!", user.id(), user.role());
 	
 					
@@ -703,7 +714,7 @@ public class TransportManagementService implements ITransportManagementService {
 							
 					if(user.role() != SuperUser 
 							&& obj.transportProvider().isPresent()
-							&& user.serviceProvider() != obj.transportProvider().get())
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(obj.transportProvider().get().id().value()))
 						throw new UserNotAllowedException("User can't update Transport Details for another Service Provider!", user.id(), user.role());
 	
 					var updateObj  = obj.updateWith(update.startAddress(),
@@ -724,7 +735,7 @@ public class TransportManagementService implements ITransportManagementService {
 					
 					if(user.role() != SuperUser 
 							&& obj.transportProvider().isPresent()
-							&& user.serviceProvider() != obj.transportProvider().get())
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(obj.transportProvider().get().id().value()))
 						throw new UserNotAllowedException("User can't update Transport Details for another Service Provider!", user.id(), user.role());
 	
 					var updateObj = obj.updatePatientSignature(update.patientSignature(),
@@ -741,7 +752,7 @@ public class TransportManagementService implements ITransportManagementService {
 					
 					if(user.role() != SuperUser 
 							&& obj.transportProvider().isPresent()
-							&& user.serviceProvider() != obj.transportProvider().get())
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(obj.transportProvider().get().id().value()))
 						throw new UserNotAllowedException("User can't update Transport Details for another Service Provider!", user.id(), user.role());
 	
 					var updateObj  = obj.updatePatientSignature(update.transporterSignature(),
@@ -782,13 +793,19 @@ public class TransportManagementService implements ITransportManagementService {
 			
 				case TransportDocument.Create create -> { 
 					
-					if(user.role() != SuperUser && user.serviceProvider() != create.healthcareServiceProvider())
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(create.healthcareServiceProvider().id().value()))
 						throw new UserNotAllowedException("User can't create a Transport Document for another Service Provider!", user.id(), user.role());
-	
+					COptional<Reference<InsuranceData>> insuranceData = create.insuranceData();
+					if(insuranceData == null || insuranceData.isEmpty())
+						insuranceData = COptional.of(
+								Reference.to(
+										repo.getPatient(create.patient().get().id())
+										.get().insuranceData().id().value()));
 					
 					var obj = new TransportDocument(repo.TransportDocumentID(), 
 							create.patient(),
-							create.insuranceData(),
+							insuranceData,
 							create.transportReason(),
 							create.startDate(),
 							create.endDate(),
@@ -808,7 +825,8 @@ public class TransportManagementService implements ITransportManagementService {
 					var deleteObj = repo.getTransportDocument(delete.id())
 							.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Document ID"));
 					
-					if(user.role() != SuperUser && user.serviceProvider() != deleteObj.healthcareServiceProvider())
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(deleteObj.healthcareServiceProvider().id().value()))
 						throw new UserNotAllowedException("User can't delete a Transport Document for another Service Provider!", user.id(), user.role());
 	
 					
@@ -822,7 +840,8 @@ public class TransportManagementService implements ITransportManagementService {
 					var obj  = repo.getTransportDocument(update.id())
 							.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Document ID"));
 	
-					if(user.role() != SuperUser && user.serviceProvider() != obj.healthcareServiceProvider())
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(obj.healthcareServiceProvider().id().value()))
 						throw new UserNotAllowedException("User can't update a Transport Document for another Service Provider!", user.id(), user.role());
 	
 					
@@ -844,7 +863,8 @@ public class TransportManagementService implements ITransportManagementService {
 					var obj  = repo.getTransportDocument(update.id())
 							.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Document ID"));
 	
-					if(user.role() != SuperUser && user.serviceProvider() != obj.healthcareServiceProvider())
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(obj.healthcareServiceProvider().id().value()))
 						throw new UserNotAllowedException("User can't update a Transport Document for another Service Provider!", user.id(), user.role());
 	
 					
@@ -898,7 +918,7 @@ public class TransportManagementService implements ITransportManagementService {
 			
 				case User.Create create -> { 
 					if(user.role() != SuperUser 
-							&& user.serviceProvider() != create.serviceProvider())
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(create.serviceProvider().id().value()))
 						throw new UserNotAllowedException("User can't create a user for another Service Provider!", 
 								user.id(), user.role());
 					if((user.role() == HealthcareAdmin 
@@ -931,7 +951,10 @@ public class TransportManagementService implements ITransportManagementService {
 				}
 				
 				case User.CreateFull create -> { 
-					
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(create.serviceProviderCmd().serviceProviderId()))
+						throw new UserNotAllowedException("User can't create a user for another Service Provider!", 
+								user.id(), user.role());
 					
 					Address address = process(create.addressCmd(), processingUser);
 					ServiceProvider sp = process(create.serviceProviderCmd(), processingUser);
@@ -954,7 +977,7 @@ public class TransportManagementService implements ITransportManagementService {
 					var deleteObj = repo.getUser(delete.id())
 							.orElseThrow(() -> new IllegalArgumentException("Invalid User ID"));
 					if(user.role() != SuperUser 
-							&& user.serviceProvider() != deleteObj.serviceProvider())
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(deleteObj.serviceProvider().id().value()))
 						throw new UserNotAllowedException("User can't delete a user for another Service Provider!", 
 								user.id(), user.role());
 					repo.delete(deleteObj);
@@ -963,7 +986,10 @@ public class TransportManagementService implements ITransportManagementService {
 				}
 				
 				case User.Update update -> {
-					
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(update.serviceProvider().id().value()))
+						throw new UserNotAllowedException("User can't delete a user for another Service Provider!", 
+								user.id(), user.role());
 					var updateObj  = repo.getUser(update.id())
 							.orElseThrow(() -> new IllegalArgumentException("Invalid User ID"))
 							.updateWith(update.lastName(),
@@ -978,9 +1004,13 @@ public class TransportManagementService implements ITransportManagementService {
 				case User.UpdateRole update -> {
 					
 					var updateObj  = repo.getUser(update.id())
-							.orElseThrow(() -> new IllegalArgumentException("Invalid User ID"))
-							.updateWith(update.role());
-					
+							.orElseThrow(() -> new IllegalArgumentException("Invalid User ID"));
+					if(user.role() != SuperUser 
+							&& !user.serviceProvider().id().value().equalsIgnoreCase(updateObj.serviceProvider().id().value()))
+						throw new UserNotAllowedException("User can't delete a user for another Service Provider!", 
+								user.id(), user.role());
+					updateObj = updateObj.updateWith(update.role());
+
 					repo.save(updateObj);
 				
 					yield updateObj;
