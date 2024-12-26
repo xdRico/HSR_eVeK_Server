@@ -1295,7 +1295,7 @@ public class JDBCRepository implements IRepository {
 				additionalInfo = COptional.of(rs.getString("additionalInfo"));
 			}
 			
-			return new TransportDocument(new Id<>(rs.getString("transportId")), 
+			return new TransportDocument(new Id<>(rs.getString("transportDocumentId")), 
 					patient,
 					insuranceData,
 					TransportReason.valueOf(rs.getString("transportReason")),
