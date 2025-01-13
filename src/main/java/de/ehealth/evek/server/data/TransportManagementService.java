@@ -793,7 +793,7 @@ public class TransportManagementService implements ITransportManagementService {
 			
 				case TransportDocument.Create create -> { 
 					
-					if(user.role() != SuperUser 
+					if((user.role() != SuperUser && user.role() != TransportDoctor)  
 							&& !user.serviceProvider().id().value().equalsIgnoreCase(create.healthcareServiceProvider().id().value()))
 						throw new UserNotAllowedException("User can't create a Transport Document for another Service Provider!", user.id(), user.role());
 					COptional<Reference<InsuranceData>> insuranceData = create.insuranceData();
@@ -825,7 +825,7 @@ public class TransportManagementService implements ITransportManagementService {
 					var deleteObj = repo.getTransportDocument(delete.id())
 							.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Document ID"));
 					
-					if(user.role() != SuperUser 
+					if((user.role() != SuperUser && user.role() != TransportDoctor)  
 							&& !user.serviceProvider().id().value().equalsIgnoreCase(deleteObj.healthcareServiceProvider().id().value()))
 						throw new UserNotAllowedException("User can't delete a Transport Document for another Service Provider!", user.id(), user.role());
 	
@@ -840,7 +840,7 @@ public class TransportManagementService implements ITransportManagementService {
 					var obj  = repo.getTransportDocument(update.id())
 							.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Document ID"));
 	
-					if(user.role() != SuperUser 
+					if((user.role() != SuperUser && user.role() != TransportDoctor)  
 							&& !user.serviceProvider().id().value().equalsIgnoreCase(obj.healthcareServiceProvider().id().value()))
 						throw new UserNotAllowedException("User can't update a Transport Document for another Service Provider!", user.id(), user.role());
 	
@@ -863,9 +863,9 @@ public class TransportManagementService implements ITransportManagementService {
 					var obj  = repo.getTransportDocument(update.id())
 							.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Document ID"));
 	
-					if(user.role() != SuperUser 
-							&& !user.serviceProvider().id().value().equalsIgnoreCase(obj.healthcareServiceProvider().id().value()))
-						throw new UserNotAllowedException("User can't update a Transport Document for another Service Provider!", user.id(), user.role());
+//					if((user.role() != SuperUser && user.role() != TransportDoctor)  
+//							&& !user.serviceProvider().id().value().equalsIgnoreCase(obj.healthcareServiceProvider().id().value()))
+//						throw new UserNotAllowedException("User can't update a Transport Document for another Service Provider!", user.id(), user.role());
 	
 					
 						var updateObj = obj.assignPatient(update.patient(),
@@ -877,14 +877,14 @@ public class TransportManagementService implements ITransportManagementService {
 				}
 				case TransportDocument.Get get -> {
 					yield repo.getTransportDocument(get.id())
-					.orElseThrow(() -> new IllegalArgumentException("Invalid Address ID"));
+					.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Document ID"));
 				}
 				case TransportDocument.GetList get -> {
 					throw new GetListThrowable(repo.getTransportDocument(get.filter()));
 				}
 				case TransportDocument.Archive archive -> {
 					yield repo.getTransportDocument(archive.id())
-					.orElseThrow(() -> new IllegalArgumentException("Invalid Address ID")).archive();
+					.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Document ID")).archive();
 				}
 			};
 		} catch(IllegalArgumentException e) {
