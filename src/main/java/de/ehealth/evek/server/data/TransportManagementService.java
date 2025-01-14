@@ -702,6 +702,9 @@ public class TransportManagementService implements ITransportManagementService {
 							&& !user.serviceProvider().id().value().equalsIgnoreCase(deleteObj.transportProvider().get().id().value()))
 						throw new UserNotAllowedException("User can't update Transport Details for another Service Provider!", user.id(), user.role());
 	
+					if(deleteObj.transportProvider() != null 
+							&& deleteObj.transportProvider().isPresent())
+						throw new UserNotAllowedException("Assigned Transports can not be deleted!", user.id(), user.role());
 					
 					repo.delete(deleteObj);
 					
