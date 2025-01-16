@@ -184,8 +184,11 @@ public abstract class SQL {
 
 	    @Override
 	    public String toString(){
-	      var sql =     
-	        "SELECT \"" + csv(columns).replace(",", "\",\"") + "\" FROM \"" + table + "\"";
+	    	String sql;
+	    	if(columns == null || columns.get(0) == "*")
+		        sql = "SELECT * FROM \"" + table + "\"";
+	    	else 
+	    		sql = "SELECT \"" + csv(columns).replace(",", "\",\"") + "\" FROM \"" + table + "\"";
 
 	      return sql +
 	        Optional.of(criteria)
