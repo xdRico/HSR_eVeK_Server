@@ -11,6 +11,9 @@ import static de.ehealth.evek.api.type.UserRole.TransportDoctor;
 import static de.ehealth.evek.api.type.UserRole.TransportInvoice;
 import static de.ehealth.evek.api.type.UserRole.TransportUser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.ehealth.evek.api.entity.Address;
 import de.ehealth.evek.api.entity.Insurance;
 import de.ehealth.evek.api.entity.InsuranceData;
@@ -25,6 +28,7 @@ import de.ehealth.evek.api.exception.ProcessingException;
 import de.ehealth.evek.api.exception.UserNameAlreadyUsedException;
 import de.ehealth.evek.api.exception.UserNotAllowedException;
 import de.ehealth.evek.api.exception.UserNotFoundException;
+import de.ehealth.evek.api.type.Id;
 import de.ehealth.evek.api.type.Reference;
 import de.ehealth.evek.api.util.COptional;
 import de.ehealth.evek.api.util.Log;
@@ -772,11 +776,20 @@ public class TransportManagementService implements ITransportManagementService {
 				case TransportDetails.GetList get -> {
 					throw new GetListThrowable(repo.getTransportDetails(get.filter()));
 				}
+				case TransportDetails.GetListByIDList get -> {
+					List<TransportDetails> elements = new ArrayList<TransportDetails>();
+					for(Id<TransportDetails> elementId : get.idList()) {
+						COptional<TransportDetails> element = repo.getTransportDetails(elementId);
+						if(element.isPresent())
+							elements.add(element.get());
+					}
+					throw new GetListThrowable(elements);
+				}
 			};
 		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
-		}catch(IllegalProcessException e) {
+		}catch(IllegalProcessException | GetListThrowable e) {
 			throw e;
 		} catch(Exception e) {
 			Log.sendException(e);
@@ -882,8 +895,18 @@ public class TransportManagementService implements ITransportManagementService {
 					yield repo.getTransportDocument(get.id())
 					.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Document ID"));
 				}
+				
 				case TransportDocument.GetList get -> {
 					throw new GetListThrowable(repo.getTransportDocument(get.filter()));
+				}
+				case TransportDocument.GetListByIDList get -> {
+					List<TransportDocument> elements = new ArrayList<TransportDocument>();
+					for(Id<TransportDocument> elementId : get.idList()) {
+						COptional<TransportDocument> element = repo.getTransportDocument(elementId);
+						if(element.isPresent())
+							elements.add(element.get());
+					}
+					throw new GetListThrowable(elements);
 				}
 				case TransportDocument.Archive archive -> {
 					yield repo.getTransportDocument(archive.id())
@@ -893,7 +916,7 @@ public class TransportManagementService implements ITransportManagementService {
 		} catch(IllegalArgumentException e) {
 			Log.sendException(e);
 			throw new IllegalProcessException(e);
-		}catch(IllegalProcessException e) {
+		}catch(IllegalProcessException | GetListThrowable e) {
 			throw e;
 		} catch(Exception e) {
 			Log.sendException(e);

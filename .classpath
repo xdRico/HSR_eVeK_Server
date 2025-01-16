@@ -7,7 +7,7 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/API_v0.2.1.jar">
+	<classpathentry kind="lib" path="lib/API_v0.2.2.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
