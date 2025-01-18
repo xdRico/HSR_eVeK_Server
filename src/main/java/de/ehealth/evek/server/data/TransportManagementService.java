@@ -762,7 +762,7 @@ public class TransportManagementService implements ITransportManagementService {
 							&& !user.serviceProvider().id().value().equalsIgnoreCase(obj.transportProvider().get().id().value()))
 						throw new UserNotAllowedException("User can't update Transport Details for another Service Provider!", user.id(), user.role());
 	
-					var updateObj  = obj.updatePatientSignature(update.transporterSignature(),
+					var updateObj  = obj.updateTransporterSignature(update.transporterSignature(),
 									update.transporterSignatureDate());
 					
 					repo.save(updateObj);
