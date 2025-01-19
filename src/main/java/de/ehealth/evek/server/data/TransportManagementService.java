@@ -823,14 +823,21 @@ public class TransportManagementService implements ITransportManagementService {
 							&& !user.serviceProvider().id().value().equalsIgnoreCase(create.healthcareServiceProvider().id().value()))
 						throw new UserNotAllowedException("User can't create a Transport Document for another Service Provider!", user.id(), user.role());
 					COptional<Reference<InsuranceData>> insuranceData = create.insuranceData();
-					if(insuranceData == null || insuranceData.isEmpty())
-						insuranceData = COptional.of(
-								Reference.to(
-										repo.getPatient(create.patient().get().id())
-										.get().insuranceData().id().value()));
+					COptional<Reference<Patient>> patient =  create.patient();
 					
+					if(insuranceData == null || insuranceData.isEmpty()) {
+						if(patient != null && patient.isPresent()) {
+							insuranceData = COptional.of(
+									Reference.to(
+											repo.getPatient(patient.get().id())
+											.get().insuranceData().id().value()));
+						} else {
+							insuranceData = COptional.empty();
+							patient = COptional.empty();
+						}
+					}
 					var obj = new TransportDocument(repo.TransportDocumentID(), 
-							create.patient(),
+							patient,
 							insuranceData,
 							create.transportReason(),
 							create.startDate(),
