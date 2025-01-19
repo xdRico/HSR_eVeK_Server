@@ -774,7 +774,17 @@ public class TransportManagementService implements ITransportManagementService {
 					.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Details ID"));
 				}
 				case TransportDetails.GetList get -> {
-					throw new GetListThrowable(repo.getTransportDetails(get.filter()));
+					
+					COptional<Reference<ServiceProvider>> tp = get.filter().transportProvider();
+					
+					if(!(user.role() == SuperUser || user.role() == TransportDoctor || user.role() == HealthcareDoctor 
+							|| user.role() == HealthcareUser || user.role() == InsuranceUser))
+						tp = COptional.of(user.serviceProvider());
+					
+					TransportDetails.Filter newFilter = new TransportDetails.Filter(get.filter().transportDocument(), 
+							get.filter().transportDate(), get.filter().address(), get.filter().direction(), tp);
+					
+					throw new GetListThrowable(repo.getTransportDetails(newFilter));
 				}
 				case TransportDetails.GetListByIDList get -> {
 					List<TransportDetails> elements = new ArrayList<TransportDetails>();
