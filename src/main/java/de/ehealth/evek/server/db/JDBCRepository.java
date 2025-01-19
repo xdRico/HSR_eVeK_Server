@@ -1814,6 +1814,8 @@ public class JDBCRepository implements IRepository {
 
 			filter.address().ifPresent(ref -> query.WHERE("address", ref.id().value()));
 			filter.type().ifPresent(ref -> query.WHERE("type", ref));
+			filter.isHealthcareProvider().ifPresent(ref -> query.WHERE("isHealthcareProvider", ref));
+			filter.isTransportProvider().ifPresent(ref -> query.WHERE("isTransportProvider", ref));
 			filter.name().ifPresent(ref -> query.WHERE("name", ref));
 
 			try (var resultSet = conn.createStatement().executeQuery(query.toString())) {
