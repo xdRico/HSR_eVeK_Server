@@ -194,7 +194,7 @@ public class JDBCRepository implements IRepository {
 			CREATE TABLE IF NOT EXISTS "transportDocument" (
 					"transportDocumentId" UUID NOT NULL PRIMARY KEY,
 					"patient" VARCHAR(10) REFERENCES "patient"("patientId"),
-					"insuranceData" UUID NOT NULL REFERENCES "insuranceData"("insuranceDataId"),
+					"insuranceData" UUID REFERENCES "insuranceData"("insuranceDataId"),
 					"transportReason" VARCHAR(63) NOT NULL,
 					"startDate" DATE NOT NULL,
 					"endDate" DATE,

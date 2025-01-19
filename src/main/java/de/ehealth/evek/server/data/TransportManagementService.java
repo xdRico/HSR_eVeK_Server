@@ -24,6 +24,7 @@ import de.ehealth.evek.api.entity.TransportDocument;
 import de.ehealth.evek.api.entity.User;
 import de.ehealth.evek.api.exception.GetListThrowable;
 import de.ehealth.evek.api.exception.IllegalProcessException;
+import de.ehealth.evek.api.exception.IsArchivedException;
 import de.ehealth.evek.api.exception.ProcessingException;
 import de.ehealth.evek.api.exception.UserNameAlreadyUsedException;
 import de.ehealth.evek.api.exception.UserNotAllowedException;
@@ -658,10 +659,19 @@ public class TransportManagementService implements ITransportManagementService {
 			return switch(cmd){
 			
 				case TransportDetails.Create create -> { 
-					//TODO
-	//				if(user.role() != SuperUser)
-	//					throw new UserNotAllowedException("User can't update Transport Details for another Service Provider!", user.id(), user.role());
-	
+				
+					TransportDocument doc = repo.getTransportDocument(create.transportDocument().id())
+							.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Document ID"));
+					
+					if(doc.isArchived())
+						throw new IsArchivedException(doc.id(), "Transport Document is already archived!");
+					
+					COptional<User> signatureUser = repo.getUser(doc.signature().id());
+					
+					if((user.role() != SuperUser) 
+							&& (signatureUser.isEmpty() || signatureUser.get().id() != user.id())
+							&& (signatureUser.isEmpty() || signatureUser.get().serviceProvider().id() != user.serviceProvider().id()))
+						throw new UserNotAllowedException("User can't create Transport Details for another Service Providers Transport Document!", user.id(), user.role());
 					
 					var obj = new TransportDetails(repo.TransportDetailsID(), 
 							create.transportDocument(),
