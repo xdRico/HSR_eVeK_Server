@@ -669,8 +669,9 @@ public class TransportManagementService implements ITransportManagementService {
 					COptional<User> signatureUser = repo.getUser(doc.signature().id());
 					
 					if((user.role() != SuperUser) 
-							&& (signatureUser.isEmpty() || signatureUser.get().id() != user.id())
-							&& (signatureUser.isEmpty() || signatureUser.get().serviceProvider().id() != user.serviceProvider().id()))
+							&& (signatureUser.isEmpty() || !signatureUser.get().id().value().equals(user.id().value()))
+							&& (signatureUser.isEmpty() 
+									|| !signatureUser.get().serviceProvider().id().value().equals(user.serviceProvider().id().value())))
 						throw new UserNotAllowedException("User can't create Transport Details for another Service Providers Transport Document!", user.id(), user.role());
 					
 					var obj = new TransportDetails(repo.TransportDetailsID(), 
