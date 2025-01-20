@@ -830,11 +830,11 @@ public class TransportManagementService implements ITransportManagementService {
 			
 				case TransportDocument.Create create -> { 
 					
-					if((user.role() != SuperUser && user.role() != TransportDoctor)  
+					/*if((user.role() != SuperUser && user.role() != TransportDoctor)  
 							&& !user.serviceProvider().id().value().equalsIgnoreCase(create.healthcareServiceProvider().id().value()))
-						throw new UserNotAllowedException("User can't create a Transport Document for another Service Provider!", user.id(), user.role());
+						throw new UserNotAllowedException("User can't create a Transport Document for another Service Provider!", user.id(), user.role());*/
 					COptional<Reference<InsuranceData>> insuranceData = create.insuranceData();
-					COptional<Reference<Patient>> patient =  create.patient();
+					COptional<Reference<Patient>> patient = create.patient();
 					
 					if(insuranceData == null || insuranceData.isEmpty()) {
 						if(patient != null && patient.isPresent()) {
