@@ -1000,6 +1000,8 @@ public class TransportManagementService implements ITransportManagementService {
 							create.role());
 					
 					repo.save(obj);
+					var loginObj = new User.LoginUser(create.userName(), create.password());
+					repo.save(loginObj);
 					
 					yield obj;
 				}
