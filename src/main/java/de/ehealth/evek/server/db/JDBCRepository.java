@@ -28,6 +28,7 @@ import de.ehealth.evek.api.exception.WrongCredentialsException;
 import de.ehealth.evek.api.type.Direction;
 import de.ehealth.evek.api.type.Id;
 import de.ehealth.evek.api.type.PatientCondition;
+import de.ehealth.evek.api.type.ProcessingState;
 import de.ehealth.evek.api.type.Reference;
 import de.ehealth.evek.api.type.TransportReason;
 import de.ehealth.evek.api.type.TransportationType;
@@ -186,7 +187,8 @@ public class JDBCRepository implements IRepository {
 					"patientSignature" VARCHAR(255),
 					"patientSignatureDate" DATE,
 					"transporterSignature" VARCHAR(255),
-					"transporterSignatureDate" DATE
+					"transporterSignatureDate" DATE,
+					"processingState" VARCHAR(31) NOT NULL
 				);
 				""";
 
@@ -449,7 +451,8 @@ public class JDBCRepository implements IRepository {
 			InsertBuilder ib = INSERT_INTO("transportDetails")
 					 .VALUE("transportId", transportDetails.id().value().toString())
 					 .VALUE("transportDocument", transportDetails.transportDocument().id().value().toString())
-					 .VALUE("transportDate", transportDetails.transportDate());
+					 .VALUE("transportDate", transportDetails.transportDate())
+					 .VALUE("processingState", transportDetails.processingState());
 			
 			if(transportDetails.startAddress() != null 
 					&& transportDetails.startAddress().isPresent())
@@ -722,7 +725,8 @@ public class JDBCRepository implements IRepository {
 			UpdateBuilder ub = UPDATE("transportDetails")
 					 .WHERE("transportId", transportDetails.id().value().toString())
 					 .SET("transportDocument", transportDetails.transportDocument().id().value().toString())
-					 .SET("transportDate", transportDetails.transportDate());
+					 .SET("transportDate", transportDetails.transportDate())
+					 .SET("processingState", transportDetails.processingState());
 			
 			if(transportDetails.startAddress() != null 
 					&& transportDetails.startAddress().isPresent())
@@ -1186,6 +1190,12 @@ public class JDBCRepository implements IRepository {
 			COptional<Date> patientSignatureDate = COptional.empty();
 			COptional<String> transporterSignature = COptional.empty();
 			COptional<Date> transporterSignatureDate = COptional.empty();
+
+			if(rs.getString("transportServiceProvider") != null 
+					&& rs.getString("transportServiceProvider") != "null"
+					&& !rs.getString("transportServiceProvider").equalsIgnoreCase("")) {
+				transportServiceProvider = COptional.of(Reference.to(rs.getString("transportServiceProvider")));
+			}
 			if(rs.getString("startAddress") != null 
 					&& rs.getString("startAddress") != "null"
 					&& !rs.getString("startAddress").equalsIgnoreCase("")) {
@@ -1210,11 +1220,6 @@ public class JDBCRepository implements IRepository {
 					&& rs.getString("tourNumber") != "null" 
 					&& !rs.getString("tourNumber").equalsIgnoreCase("")) {
 				tourNumber = COptional.of(rs.getString("tourNumber"));
-			}
-			if(rs.getString("transportServiceProvider") != null 
-					&& rs.getString("transportServiceProvider") != "null"
-					&& !rs.getString("transportServiceProvider").equalsIgnoreCase("")) {
-				transportServiceProvider = COptional.of(Reference.to(rs.getString("transportServiceProvider")));
 			}
 			if(rs.getString("paymentExemption") != null 
 					&& rs.getString("paymentExemption") != "null" 
@@ -1254,7 +1259,8 @@ public class JDBCRepository implements IRepository {
 					patientSignature,
 					patientSignatureDate,
 					transporterSignature,
-					transporterSignatureDate);
+					transporterSignatureDate,
+					ProcessingState.valueOf(rs.getString("processingState")));
 		}
 
 		/**
@@ -1840,6 +1846,7 @@ public class JDBCRepository implements IRepository {
 			filter.address().ifPresent(ref -> query.WHERE("endAddress", ref.id().value()));
 			filter.direction().ifPresent(ref -> query.WHERE("direction", ref));
 			filter.transportProvider().ifPresent(ref -> query.WHERE("transportProvider", ref.id().value()));
+			filter.processingState().ifPresent(ref -> query.WHERE("processingState", ref));
 
 			try (var resultSet = conn.createStatement().executeQuery(query.toString())) {
 				var tcs = new ArrayList<TransportDetails>();
@@ -1918,9 +1925,6 @@ public class JDBCRepository implements IRepository {
 
 		@Override
 		public COptional<Address> getAddress(Address.Create create) {
-			Object name = null;
-			if(create.name().isPresent())
-				name = create.name();
 
 			try (var stmt = conn.createStatement();
 					var rs = stmt.executeQuery(selectAllSQL(
@@ -1937,7 +1941,7 @@ public class JDBCRepository implements IRepository {
 									create.city(),
 									create.country(),
 									create.houseNumber(),
-									name,
+									create.name().orElse(null),
 									create.postCode(),
 									create.streetName()
 							}))) {
