@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <jardesc>
-    <jar path="HSR_eVeK_Server/build/Server_v1.0.0.jar"/>
+    <jar path="HSR_eVeK_Server/build/Server_v1.0.1.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/HSR_eVeK_Server/pc.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="true" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>

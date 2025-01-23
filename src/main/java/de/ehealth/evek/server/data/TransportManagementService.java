@@ -703,6 +703,10 @@ public class TransportManagementService implements ITransportManagementService {
 					if(obj.transportProvider().isPresent())
 						throw new IllegalArgumentException("Transport has already been assigned to " + obj.transportProvider().get().id().value() + "!");
 					
+					if(obj.processingState() == ProcessingState.invoiced || obj.processingState() == ProcessingState.closed) 
+						throw new IllegalProcessException("Invoiced or closed Transports are not allowed to be edited!");
+					
+					
 					var updateObj  = obj.updateTransportProvider(update.transportProvider());
 					
 					repo.save(updateObj);
@@ -724,6 +728,10 @@ public class TransportManagementService implements ITransportManagementService {
 							&& !user.serviceProvider().id().value().equalsIgnoreCase(deleteObj.transportProvider().get().id().value()))
 						throw new UserNotAllowedException("Assigned Transports can not be deleted!", user.id(), user.role());
 					
+					if(deleteObj.processingState() == ProcessingState.invoiced || deleteObj.processingState() == ProcessingState.closed) 
+						throw new IllegalProcessException("Invoiced or closed Transports are not allowed to be deleted!");
+					
+					
 					repo.delete(deleteObj);
 					
 					yield deleteObj;
@@ -738,8 +746,8 @@ public class TransportManagementService implements ITransportManagementService {
 							&& !user.serviceProvider().id().value().equalsIgnoreCase(obj.transportProvider().get().id().value()))
 						throw new UserNotAllowedException("User can't update Transport Details for another Service Provider!", user.id(), user.role());
 					
-					if(obj.processingState() == ProcessingState.invoiced) 
-						throw new IllegalProcessException("Invoiced Transports are not allowed to be edited!");
+					if(obj.processingState() == ProcessingState.invoiced || obj.processingState() == ProcessingState.closed) 
+						throw new IllegalProcessException("Invoiced or closed Transports are not allowed to be edited!");
 						
 					var updateObj  = obj.updateWith(update.startAddress(),
 									update.endAddress(),
@@ -751,6 +759,36 @@ public class TransportManagementService implements ITransportManagementService {
 					repo.save(updateObj);
 				
 					yield updateObj;
+				}
+				case TransportDetails.Close update -> {
+					
+					var obj = repo.getTransportDetails(update.id())
+							.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Details ID"));
+					
+					TransportDocument doc = repo.getTransportDocument(obj.transportDocument().id())
+							.orElseThrow(() -> new ProcessingException("Invalid Transport Document ID"));
+					
+					if(!doc.insuranceData().isPresent())
+						throw new ProcessingException("A Transport can not be closed with no Patient assigned to the Transport Document!");
+					
+					if(user.role() != SuperUser
+							&& !(repo.getInsuranceData(doc.insuranceData().get().id())
+									.orElseThrow(() -> new ProcessingException("Invalid Insurance Data ID")))
+											.insurance().id().value().equalsIgnoreCase(user.serviceProvider().id().value()))
+						throw new UserNotAllowedException("Users can't close Transports of Patients of another Insurance!", user.id(), user.role());
+					
+					if(doc.isArchived())
+						throw new IsArchivedException(doc.id(), "Transport Document is already archived!");
+					
+					if(obj.processingState() != ProcessingState.invoiced)
+						throw new IllegalProcessException("Only invoiced Transports are allowed to be closed!");
+							
+					var updateObj = obj.close();
+					
+					repo.save(updateObj);
+					
+					yield updateObj;
+				
 				}
 				case TransportDetails.UpdatePatientSignature update -> {
 					
@@ -819,16 +857,29 @@ public class TransportManagementService implements ITransportManagementService {
 				}
 				case TransportDetails.GetList get -> {
 					
-					COptional<Reference<ServiceProvider>> tp = get.filter().transportProvider();
-					
-					if(!(user.role() == SuperUser || user.role() == TransportDoctor || user.role() == HealthcareDoctor 
-							|| user.role() == HealthcareUser || user.role() == InsuranceUser))
-						tp = COptional.of(user.serviceProvider());
-					
-					TransportDetails.Filter newFilter = new TransportDetails.Filter(get.filter().transportDocument(), 
-							get.filter().transportDate(), get.filter().address(), get.filter().direction(), tp, COptional.empty());
-					
-					throw new GetListThrowable(repo.getTransportDetails(newFilter));
+					List<TransportDetails> list = repo.getTransportDetails(get.filter());
+					List<TransportDetails> throwList = new ArrayList<TransportDetails>();
+					if(user.role() == TransportInvoice || user.role() == TransportUser) {
+						COptional<TransportDocument> doc;
+						for(TransportDetails det : list)
+							if(det.transportProvider().isPresent()
+									&& det.transportProvider().get().id().value().equalsIgnoreCase(user.serviceProvider().id().value())
+									&& (doc = repo.getTransportDocument(det.transportDocument().id())).isPresent() 
+									&& !doc.get().isArchived())
+								throwList.add(det);					
+					}else if(user.role() == InsuranceUser) {
+						COptional<TransportDocument> doc;
+						COptional<InsuranceData> ins;
+						for(TransportDetails det : list)
+							if((det.processingState() == ProcessingState.invoiced || det.processingState() == ProcessingState.closed)
+									&& (doc = repo.getTransportDocument(det.transportDocument().id())).isPresent() 
+									&& !doc.get().isArchived()
+									&& doc.get().insuranceData().isPresent()
+									&& (ins = repo.getInsuranceData(doc.get().insuranceData().get().id())).isPresent()
+									&& ins.get().insurance().id().value().equalsIgnoreCase(user.serviceProvider().id().value()))
+								throwList.add(det);
+					}
+					throw new GetListThrowable(throwList);
 				}
 				case TransportDetails.GetListByIDList get -> {
 					List<TransportDetails> elements = new ArrayList<TransportDetails>();
@@ -958,6 +1009,46 @@ public class TransportManagementService implements ITransportManagementService {
 				
 					yield updateObj;
 				}
+				
+				case TransportDocument.Archive archive -> {
+					
+					TransportDocument doc = repo.getTransportDocument(archive.id())
+							.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Document ID"));
+					
+					
+					if(doc.insuranceData().isEmpty() 
+							|| doc.insuranceData().get().id() == null
+							|| doc.patient().isEmpty()
+							|| doc.patient().get().id() == null)
+						throw new IllegalProcessException("Transport Documents without Patient data are not allowed to be archived!");
+					
+					InsuranceData insuranceData = repo.getInsuranceData(doc.insuranceData().get().id())
+							.orElseThrow(() -> new IllegalArgumentException("Invalid Insurance Data ID"));
+					
+					if(!insuranceData.insurance().id().value().equalsIgnoreCase(
+									user.serviceProvider().id().value()))
+						throw new UserNotAllowedException("User can't update a Transport Document for another Insurance!", user.id(), user.role());
+					
+					if(doc.isArchived())
+						throw new IsArchivedException(archive.id());
+					
+					for(TransportDetails det : repo.getTransportDetails(new TransportDetails.Filter(COptional.of(Reference.to(doc.id())), 
+							COptional.empty(),
+							COptional.empty(),
+							COptional.empty(),
+							COptional.empty(),
+							COptional.empty())))
+						if(det.processingState() != ProcessingState.closed)
+							throw new IllegalProcessException("All Transports of a Transport Document need to be closed for the Transport Document to be archived!");
+					
+					doc = doc.archive();
+
+					
+					repo.save(doc);
+
+					
+					yield doc;
+				}
 				case TransportDocument.Get get -> {
 					yield repo.getTransportDocument(get.id())
 					.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Document ID"));
@@ -968,18 +1059,71 @@ public class TransportManagementService implements ITransportManagementService {
 					List<TransportDocument> list = repo.getTransportDocument(get.filter());
 					List<TransportDocument> throwList = new ArrayList<TransportDocument>();
 					if(user.role() == InsuranceUser) {
-						for(TransportDocument doc : list) 
-							if(doc.insuranceData().isPresent() && doc.insuranceData().get().id() != null) {
+						for(TransportDocument doc : list) {
+							if(doc.isArchived())
+								continue;
+							if(doc.insuranceData().isPresent() 
+									&& doc.insuranceData().get().id() != null) {
 								COptional<InsuranceData> insuranceData = repo.getInsuranceData(doc.insuranceData().get().id());
 								if(insuranceData.isPresent() 
-										&& insuranceData.get().insurance().id().value().equalsIgnoreCase(user.serviceProvider().id().value()))
-									throwList.add(doc);
+										&& insuranceData.get().insurance().id().value().equalsIgnoreCase(user.serviceProvider().id().value())) {
+									boolean isValid = true;
+									for(TransportDetails det : repo.getTransportDetails(
+											new TransportDetails.Filter(
+													COptional.of(Reference.to(doc.id())), 
+													COptional.empty(), 
+													COptional.empty(), 
+													COptional.empty(), 
+													COptional.empty(), 
+													COptional.empty())))
+										if(det.processingState() != ProcessingState.invoiced && det.processingState() != ProcessingState.closed) {
+											isValid = false;
+											break;
+										}
+									if(isValid)
+										throwList.add(doc);
+								}
 							}
+						}
+					}else if(user.role() == TransportDoctor || user.role() == TransportInvoice) { 
+						for(TransportDocument doc : list) {
+							if(doc.isArchived())
+								continue;
+							COptional<User> u;
+							if(doc.healthcareServiceProvider().id().value().equalsIgnoreCase(user.serviceProvider().id().value())
+									|| doc.signature().id().value().equalsIgnoreCase(user.id().value())) 
+								throwList.add(doc);	
+							else if((u = repo.getUser(doc.signature().id())).isPresent() 
+										&& u.get().serviceProvider().id().value().equalsIgnoreCase(
+												doc.healthcareServiceProvider().id().value()))
+								throwList.add(doc);	
+							else if(!repo.getTransportDetails(new TransportDetails.Filter(COptional.of(Reference.to(doc.id())), 
+									COptional.empty(), 
+									COptional.empty(), 
+									COptional.empty(), 
+									COptional.of(Reference.to(user.serviceProvider().id())),
+									COptional.empty())).isEmpty())
+								throwList.add(doc);
+							
+						}
 					
-					} else  throwList = list;
-					
+					}else if(user.role() == HealthcareDoctor){
+						for(TransportDocument doc : list) {
+							if(doc.isArchived())
+								continue;
+							COptional<User> u;
+							if(doc.healthcareServiceProvider().id().value().equalsIgnoreCase(user.serviceProvider().id().value())
+									|| doc.signature().id().value().equalsIgnoreCase(user.id().value())) 
+								throwList.add(doc);	
+							else if((u = repo.getUser(doc.signature().id())).isPresent()
+									&& u.get().serviceProvider().id().value().equalsIgnoreCase(
+											doc.healthcareServiceProvider().id().value()))
+									throwList.add(doc);	
+						}
+					}else 
+						throwList = list;
 						
-					throw new GetListThrowable(list);
+					throw new GetListThrowable(throwList);
 				}
 				case TransportDocument.GetListByIDList get -> {
 					List<TransportDocument> elements = new ArrayList<TransportDocument>();
@@ -989,30 +1133,6 @@ public class TransportManagementService implements ITransportManagementService {
 							elements.add(element.get());
 					}
 					throw new GetListThrowable(elements);
-				}
-				case TransportDocument.Archive archive -> {
-					
-					TransportDocument doc = repo.getTransportDocument(archive.id())
-							.orElseThrow(() -> new IllegalArgumentException("Invalid Transport Document ID"));
-					
-					if((user.role() != SuperUser)  
-							&& !user.serviceProvider().id().value().equalsIgnoreCase(doc.healthcareServiceProvider().id().value())) {
-						if(doc.insuranceData().isPresent() && doc.insuranceData().get().id() != null) {
-							COptional<InsuranceData> insuranceData = repo.getInsuranceData(doc.insuranceData().get().id());
-							if(!insuranceData.isPresent() 
-									|| !insuranceData.get().insurance().id().value().equalsIgnoreCase(
-											user.serviceProvider().id().value())
-									&& user.role() != InsuranceUser)
-								throw new UserNotAllowedException("User can't update a Transport Document for another Service Provider!", user.id(), user.role());
-						}
-					}
-					if(doc.isArchived())
-						throw new IsArchivedException(archive.id());
-					
-					if(doc.patient().isEmpty() || doc.insuranceData().isEmpty())
-						throw new IllegalProcessException("Transport Documents without Patient data are not allowed to be archived!");
-					
-					yield doc.archive();
 				}
 			};
 		} catch(IllegalArgumentException e) {
