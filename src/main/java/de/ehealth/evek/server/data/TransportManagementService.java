@@ -670,9 +670,9 @@ public class TransportManagementService implements ITransportManagementService {
 					COptional<User> signatureUser = repo.getUser(doc.signature().id());
 					
 					if((user.role() != SuperUser) 
-							&& (signatureUser.isEmpty() || !signatureUser.get().id().value().equals(user.id().value()))
-							&& (signatureUser.isEmpty() 
-									|| !signatureUser.get().serviceProvider().id().value().equals(user.serviceProvider().id().value())))
+							&& signatureUser.isEmpty() 
+							&& !signatureUser.get().id().value().equals(user.id().value())
+							&& !signatureUser.get().serviceProvider().id().value().equals(user.serviceProvider().id().value()))
 						throw new UserNotAllowedException("User can't create Transport Details for another Service Providers Transport Document!", user.id(), user.role());
 					
 					var obj = new TransportDetails(repo.TransportDetailsID(), 
@@ -859,7 +859,9 @@ public class TransportManagementService implements ITransportManagementService {
 					
 					List<TransportDetails> list = repo.getTransportDetails(get.filter());
 					List<TransportDetails> throwList = new ArrayList<TransportDetails>();
-					if(user.role() == TransportInvoice || user.role() == TransportUser) {
+					if(user.role() == TransportInvoice 
+							|| user.role() == TransportUser 
+							|| user.role() == TransportDoctor) {
 						COptional<TransportDocument> doc;
 						for(TransportDetails det : list)
 							if(det.transportProvider().isPresent()
