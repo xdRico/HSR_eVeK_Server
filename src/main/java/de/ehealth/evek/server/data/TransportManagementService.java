@@ -1069,7 +1069,7 @@ public class TransportManagementService implements ITransportManagementService {
 								COptional<InsuranceData> insuranceData = repo.getInsuranceData(doc.insuranceData().get().id());
 								if(insuranceData.isPresent() 
 										&& insuranceData.get().insurance().id().value().equalsIgnoreCase(user.serviceProvider().id().value())) {
-									boolean isValid = true;
+									boolean isValid = false;
 									for(TransportDetails det : repo.getTransportDetails(
 											new TransportDetails.Filter(
 													COptional.of(Reference.to(doc.id())), 
@@ -1078,8 +1078,8 @@ public class TransportManagementService implements ITransportManagementService {
 													COptional.empty(), 
 													COptional.empty(), 
 													COptional.empty())))
-										if(det.processingState() != ProcessingState.invoiced && det.processingState() != ProcessingState.closed) {
-											isValid = false;
+										if(det.processingState() == ProcessingState.invoiced || det.processingState() == ProcessingState.closed) {
+											isValid = true;
 											break;
 										}
 									if(isValid)
